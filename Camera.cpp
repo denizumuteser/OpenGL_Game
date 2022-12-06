@@ -1,6 +1,7 @@
 #include"Camera.h"
 
-
+bool cheat_mode = false;
+int KEY_C_LAST_STATE = GLFW_RELEASE;
 
 Camera::Camera(int width, int height, glm::vec3 position)
 {
@@ -34,6 +35,10 @@ void Camera::Matrix(Shader& shader, const char* uniform)
 
 void Camera::Inputs(GLFWwindow* window)
 {
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, true);
+	}
 	// Handles key inputs
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
@@ -63,14 +68,36 @@ void Camera::Inputs(GLFWwindow* window)
 	{
 		speed = 0.03f;
 	}
-	else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
 	{
 		speed = 0.01f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+	{
+		KEY_C_LAST_STATE = GLFW_PRESS;
+	}
+	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_RELEASE && KEY_C_LAST_STATE == GLFW_PRESS)
+	{
+		if (cheat_mode)
+		{
+			cheat_mode = false;
+			//init position and oriantation
+			Orientation.y = 0.0f;
+			Position.x = 0.0f;
+			Position.y = 0.5f;
+
+		}
+		else
+		{
+			cheat_mode = true;
+		}
+		KEY_C_LAST_STATE = GLFW_RELEASE;
 	}
 
 
 	// Handles mouse inputs
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+	//if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
 	{
 		// Hides mouse cursor
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
@@ -93,15 +120,18 @@ void Camera::Inputs(GLFWwindow* window)
 		float rotX = sensitivity * (float)(mouseY - (height / 2)) / height;
 		float rotY = sensitivity * (float)(mouseX - (width / 2)) / width;
 
-		// Calculates upcoming vertical change in the Orientation
-		glm::vec3 newOrientation = glm::rotate(Orientation, glm::radians(-rotX), glm::normalize(glm::cross(Orientation, Up)));
-
-		// Decides whether or not the next vertical Orientation is legal or not
-		if (abs(glm::angle(newOrientation, Up) - glm::radians(90.0f)) <= glm::radians(85.0f))
+		//freecam
+		if (cheat_mode)
 		{
-			Orientation = newOrientation;
+			// Calculates upcoming vertical change in the Orientation
+			glm::vec3 newOrientation = glm::rotate(Orientation, glm::radians(-rotX), glm::normalize(glm::cross(Orientation, Up)));
+			// Decides whether or not the next vertical Orientation is legal or not
+			if (abs(glm::angle(newOrientation, Up) - glm::radians(90.0f)) <= glm::radians(85.0f))
+			{
+				Orientation = newOrientation;
+			}
 		}
-
+		
 		// Rotates the Orientation left and right
 		Orientation = glm::rotate(Orientation, glm::radians(-rotY), Up);
 
