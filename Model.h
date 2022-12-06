@@ -13,12 +13,12 @@ public:
 	Model(const std::string& file);
 
 	void Draw(Shader& shader, Camera& camera);
-	static void loadModel(std::string const& path);
-	static void processNode(aiNode* node, const aiScene* scene);
-	static Mesh processMesh(aiMesh* mesh, const aiScene* scene);
-	static std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type,
+	void loadModel(std::string const& path);
+	void processNode(aiNode* node, const aiScene* scene);
+	Mesh processMesh(aiMesh* mesh, const aiScene* scene);
+	std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type,
 		std::string typeName);
-	static std::string directory;
+	std::string directory;
 private:
 	// model data 
 	static std::vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
