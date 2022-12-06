@@ -77,7 +77,7 @@ int main()
 	//Model model((parentDir + modelPath).c_str());
 
 	// Original code from the tutorial
-	 Model model("models/bunny/scene.gltf");
+	 Model model = Model("models/zombie/scene.gltf");
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))

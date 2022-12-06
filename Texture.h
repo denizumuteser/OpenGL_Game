@@ -12,6 +12,9 @@ public:
 	GLuint ID;
 	const char* type;
 	GLuint unit;
+	std::string path;
+
+	Texture();
 
 	Texture(const char* image, const char* texType, GLuint slot);
 

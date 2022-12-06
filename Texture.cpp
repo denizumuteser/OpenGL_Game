@@ -1,5 +1,9 @@
 #include"Texture.h"
 
+Texture::Texture()
+{
+}
+
 Texture::Texture(const char* image, const char* texType, GLuint slot)
 {
 	// Assigns the type of the texture ot the texture object

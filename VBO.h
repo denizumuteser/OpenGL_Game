@@ -8,6 +8,7 @@
 // Structure to standardize the vertices used in the meshes
 struct Vertex
 {
+public:
 	glm::vec3 position;
 	glm::vec3 normal;
 	glm::vec3 color;
