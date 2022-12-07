@@ -30,21 +30,35 @@ void Mesh::Draw(Shader& shader, Camera& camera)
 	VAO.Bind();
 
 	// Keep track of how many of each type of textures we have
-	unsigned int numDiffuse = 0;
-	unsigned int numSpecular = 0;
-
+	unsigned int numDiffuse = 1;
+	unsigned int numSpecular = 1;
+	//std::cout << textures.size() << std::endl;
 	for (unsigned int i = 0; i < textures.size(); i++)
 	{
+		glActiveTexture(GL_TEXTURE0 + i);
 		std::string num;
 		std::string type = textures[i].type;
-		if (type == "diffuse")
+		if (type == "texture_diffuse")
 		{
 			num = std::to_string(numDiffuse++);
 		}
-		else if (type == "specular")
+		else if (type == "texture_specular")
 		{
 			num = std::to_string(numSpecular++);
 		}
+		shader.Activate();
+		//glUniform1i(glGetUniformLocation(shader.ID, (type + num).c_str()), i);
+		
+		// Gets the location of the uniform
+		//GLuint texUni = glGetUniformLocation(shader.ID, uniform);
+		// Shader needs to be activated before changing the value of a uniform
+		//shader.Activate();
+		// Sets the value of the uniform
+		//glUniform1i(texUni, unit);
+
+		//glActiveTexture(GL_TEXTURE0 + textures[i].unit);
+		//glBindTexture(GL_TEXTURE_2D, textures[i].ID);
+		//std::cout << (type + num).c_str()  << std::endl;
 		textures[i].texUnit(shader, (type + num).c_str(), i);
 		textures[i].Bind();
 	}
@@ -54,4 +68,6 @@ void Mesh::Draw(Shader& shader, Camera& camera)
 
 	// Draw the actual mesh
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+
+	
 }

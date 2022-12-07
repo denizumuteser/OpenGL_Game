@@ -9,13 +9,18 @@ Model::Model(const std::string& path)
 {
     //gammaCorrection = gamma;
     loadModel(path);
+    //std::cout << "number of meshes from model : " << meshes.size() << std::endl;
 }
 
 // draws the model, and thus all its meshes
 void Model::Draw(Shader& shader, Camera& camera)
 {
     for (unsigned int i = 0; i < meshes.size(); i++)
+    {
+        //std::cout << "drawing mesh number: " << i << std::endl;
         meshes[i].Draw(shader, camera);
+    }
+        
 }
 
 // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
@@ -130,10 +135,10 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
     // normal: texture_normalN
 
     // 1. diffuse maps
-    std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "diffuse");
+    std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
     // 2. specular maps
-    std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "specular");
+    std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
     textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
     // 3. normal maps
     //std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "normal");
@@ -143,6 +148,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
     //textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
     // return a mesh object created from the extracted mesh data
+    //std::cout << textures.size() << std::endl;
     return Mesh(vertices, indices, textures);
 }
 
@@ -151,6 +157,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName)
 {
     std::vector<Texture> textures;
+    //std::cout << (mat->GetTextureCount(type)) << std::endl;
     for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
     {
         aiString str;

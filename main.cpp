@@ -36,12 +36,12 @@ int main()
 	Mesh floor(verts, ind, tex);
 
 	// BOX
-	Shader shaderProgram2("default.vert", "default.frag");
-	std::vector <Vertex> verts2(BoxVertices, BoxVertices + sizeof(BoxVertices) / sizeof(Vertex));
-	std::vector <GLuint> ind2(boxIndices, boxIndices + sizeof(boxIndices) / sizeof(GLuint));
-	std::vector <Texture> tex2(BoxTextures, BoxTextures + sizeof(BoxTextures) / sizeof(Texture));
+	//Shader shaderProgram2("default.vert", "default.frag");
+	//std::vector <Vertex> verts2(BoxVertices, BoxVertices + sizeof(BoxVertices) / sizeof(Vertex));
+	//std::vector <GLuint> ind2(boxIndices, boxIndices + sizeof(boxIndices) / sizeof(GLuint));
+	//std::vector <Texture> tex2(BoxTextures, BoxTextures + sizeof(BoxTextures) / sizeof(Texture));
 	// Create floor mesh
-	Mesh Box(verts2, ind2, tex2);
+	//Mesh Box(verts2, ind2, tex2);
 
 	// Shader for light cube
 	Shader lightShader("light.vert", "light.frag");
@@ -56,7 +56,7 @@ int main()
 	//model
 	Shader modelShader("default.vert", "default.frag");
 	//Model ourModel("models/zombie/scene.gltf");
-	Model ourModel("models/backpack/backpack.obj");
+	Model ourModel("models/crate/scene.gltf");
 
 	//light transform
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -72,20 +72,22 @@ int main()
 	objectModel = glm::scale(objectModel, glm::vec3(10, 10, 10));
 
 	//box transform
-	glm::vec3 objectPos2 = glm::vec3(0.5f, 0.0f, -2.0f);
-	glm::mat4 objectModel2 = glm::mat4(1.0f);
-	objectModel2 = glm::translate(objectModel2, objectPos2);
-	objectModel2 = glm::scale(objectModel2, glm::vec3(2, 2, 2));
+	//glm::vec3 objectPos2 = glm::vec3(0.5f, 0.0f, -2.0f);
+	//glm::mat4 objectModel2 = glm::mat4(1.0f);
+	//objectModel2 = glm::translate(objectModel2, objectPos2);
+	//objectModel2 = glm::scale(objectModel2, glm::vec3(2, 2, 2));
 
 	//model
-	//glm::vec3 objectPos3 = glm::vec3(-0.2f, 0.095f, -2.0f);
-	glm::vec3 objectPos3 = glm::vec3(-0.2f, 0.15f, -2.0f);
+	//glm::vec3 objectPos3 = glm::vec3(-0.2f, 0.095f, -2.0f); //zombie
+	//glm::vec3 objectPos3 = glm::vec3(-0.2f, 0.15f, -2.0f); //backpack
+	glm::vec3 objectPos3 = glm::vec3(-0.2f, 0.3f, -2.0f);
 	glm::mat4 objectModel3 = glm::mat4(1.0f);
 	objectModel3 = glm::translate(objectModel3, objectPos3);
-	//objectModel3 = glm::scale(objectModel3, glm::vec3(0.008, 0.008, 0.008));
-	objectModel3 = glm::scale(objectModel3, glm::vec3(0.1, 0.1, 0.1));
-	//objectModel3 = glm::rotate(objectModel3, glm::radians(-90.0f), glm::vec3(1, 0, 0));
-	//objectModel3 = glm::translate(objectModel3, glm::vec3(-0.5f, 1.0f, -2.0f));
+	//objectModel3 = glm::scale(objectModel3, glm::vec3(0.008, 0.008, 0.008)); //zombie
+	objectModel3 = glm::scale(objectModel3, glm::vec3(0.1, 0.1, 0.1)); //crate
+	//objectModel3 = glm::scale(objectModel3, glm::vec3(0.1, 0.1, 0.1));
+	objectModel3 = glm::rotate(objectModel3, glm::radians(-90.0f), glm::vec3(1, 0, 0));
+	objectModel3 = glm::translate(objectModel3, glm::vec3(-0.5f, 1.0f, -2.0f));
 	
 	lightShader.Activate(); //light
 	glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
@@ -94,10 +96,10 @@ int main()
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "model"), 1, GL_FALSE, glm::value_ptr(objectModel));
 	glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
-	shaderProgram2.Activate(); //box
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "model"), 1, GL_FALSE, glm::value_ptr(objectModel2));
-	glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-	glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+	//shaderProgram2.Activate(); //box
+	//glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "model"), 1, GL_FALSE, glm::value_ptr(objectModel2));
+	//glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	//glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 	modelShader.Activate(); //model
 	glUniformMatrix4fv(glGetUniformLocation(modelShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(objectModel3));
 	glUniform4f(glGetUniformLocation(modelShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
@@ -135,7 +137,7 @@ int main()
 		// Draws different meshes
 		floor.Draw(shaderProgram, camera);
 		light.Draw(lightShader, camera);
-		Box.Draw(shaderProgram2, camera);
+		//Box.Draw(shaderProgram2, camera);
 		ourModel.Draw(modelShader, camera);
 
 		// Swap the back buffer with the front buffer
@@ -147,7 +149,7 @@ int main()
 	// Delete all the objects we've created
 	shaderProgram.Delete();
 	lightShader.Delete();
-	shaderProgram2.Delete();
+	//shaderProgram2.Delete();
 	modelShader.Delete();
 	// Delete window before ending the program
 	glfwDestroyWindow(window);

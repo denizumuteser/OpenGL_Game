@@ -168,8 +168,6 @@
     <None Include="default.vert" />
     <None Include="light.frag" />
     <None Include="light.vert" />
-    <None Include="model.frag" />
-    <None Include="model.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
@@ -185,8 +183,6 @@
   <ItemGroup>
     <Image Include="box.png" />
     <Image Include="lama.png" />
-    <Image Include="planks.png" />
-    <Image Include="planksSpec.png" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="shot.mp3" />
