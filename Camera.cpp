@@ -77,11 +77,11 @@ void Camera::Inputs(GLFWwindow* window)
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 	{
-		speed = 0.03f;
+		speed = 0.005f;
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
 	{
-		speed = 0.01f;
+		speed = 0.001f;
 	}
 	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
 	{
@@ -95,7 +95,7 @@ void Camera::Inputs(GLFWwindow* window)
 			//init position and oriantation
 			Orientation.y = 0.0f;
 			Position.x = 0.0f;
-			Position.y = 0.5f;
+			Position.y = 0.15f;
 
 		}
 		else

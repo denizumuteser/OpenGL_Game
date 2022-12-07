@@ -16,12 +16,12 @@ bool firstMouse = true;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 // Vertices coordinates
-Vertex vertices[] =
-{ //               COORDINATES           /            COLORS          /           TexCoord         /       NORMALS         //
+Vertex vertices[] = //floor
+{ //               COORDINATES           /            NORMALS          /       COLOR        //           TexCoord         /
 	Vertex{glm::vec3(-1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(0.0f, 0.0f)},
-	Vertex{glm::vec3(-1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(0.0f, 1.0f)},
-	Vertex{glm::vec3(1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(1.0f, 1.0f)},
-	Vertex{glm::vec3(1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(1.0f, 0.0f)}
+	Vertex{glm::vec3(-1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(0.0f, 100.0f)},
+	Vertex{glm::vec3(1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(100.0f, 100.0f)},
+	Vertex{glm::vec3(1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(100.0f, 0.0f)}
 };
 
 // Indices for vertices order
@@ -33,13 +33,13 @@ GLuint indices[] =
 
 Vertex lightVertices[] =
 { //     COORDINATES     //
-	Vertex{glm::vec3(-0.1f, -0.1f,  0.1f)},
-	Vertex{glm::vec3(-0.1f, -0.1f, -0.1f)},
-	Vertex{glm::vec3(0.1f, -0.1f, -0.1f)},
-	Vertex{glm::vec3(0.1f, -0.1f,  0.1f)},
-	Vertex{glm::vec3(-0.1f,  0.1f,  0.1f)},
-	Vertex{glm::vec3(-0.1f,  0.1f, -0.1f)},
-	Vertex{glm::vec3(0.1f,  0.1f, -0.1f)},
+	Vertex{glm::vec3(-0.00f, -0.0f,  0.1f)},
+	Vertex{glm::vec3(-0.00f, -0.0f, -0.00f)},
+	Vertex{glm::vec3(0.1f, -0.0f, -0.00f)},
+	Vertex{glm::vec3(0.1f, -0.0f,  0.1f)},
+	Vertex{glm::vec3(-0.00f,  0.1f,  0.1f)},
+	Vertex{glm::vec3(-0.00f,  0.1f, -0.0f)},
+	Vertex{glm::vec3(0.1f,  0.1f, -0.00f)},
 	Vertex{glm::vec3(0.1f,  0.1f,  0.1f)}
 };
 
@@ -59,32 +59,32 @@ GLuint lightIndices[] =
 	4, 6, 7
 };
 
-Vertex boxVertices[] =
-{ //               COORDINATES           /            COLORS          /           TexCoord         /       NORMALS         //
-	Vertex{glm::vec3(-0.1f, -0.1f,  0.1f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(2), glm::vec2(0)},
-	Vertex{glm::vec3(-0.1f, -0.1f, -0.1f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(2), glm::vec2(0)},
-	Vertex{glm::vec3(0.1f, -0.1f, -0.1f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(2), glm::vec2(0)},
-	Vertex{glm::vec3(0.1f, -0.1f,  0.1f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(2), glm::vec2(0)},
-	Vertex{glm::vec3(-0.1f,  0.1f,  0.1f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(2), glm::vec2(0)},
-	Vertex{glm::vec3(-0.1f,  0.1f, -0.1f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(2), glm::vec2(0)},
-	Vertex{glm::vec3(0.1f,  0.1f, -0.1f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(2), glm::vec2(0)},
-	Vertex{glm::vec3(0.1f,  0.1f,  0.1f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(2), glm::vec2(0)}
+Vertex BoxVertices[] =
+{ //     COORDINATES     //normal // color //texture
+	Vertex{glm::vec3(-0.00f, -0.0f,  0.1f), glm::vec3(0.0f, 1.0f, 0.0f),glm::vec3(1),glm::vec2(0.0f, 0.0f)},
+	Vertex{glm::vec3(-0.00f, -0.0f, -0.00f), glm::vec3(0.0f, 1.0f, 0.0f),glm::vec3(1),glm::vec2(1.0f, 1.0f)},
+	Vertex{glm::vec3(0.1f, -0.0f, -0.00f), glm::vec3(0.0f, 1.0f, 0.0f),glm::vec3(1),glm::vec2(0.0f, 0.0f)},
+	Vertex{glm::vec3(0.1f, -0.0f,  0.1f), glm::vec3(0.0f, 1.0f, 0.0f),glm::vec3(1),glm::vec2(1.0f, 1.0f)},
+	Vertex{glm::vec3(-0.00f,  0.1f,  0.1f), glm::vec3(0.0f, 1.0f, 0.0f),glm::vec3(1),glm::vec2(0.0f, 0.0f)},
+	Vertex{glm::vec3(-0.00f,  0.1f, -0.0f), glm::vec3(0.0f, 1.0f, 0.0f),glm::vec3(1),glm::vec2(1.0f, 1.0f)},
+	Vertex{glm::vec3(0.1f,  0.1f, -0.00f), glm::vec3(0.0f, 1.0f, 0.0f),glm::vec3(1),glm::vec2(0.0f, 0.0f)},
+	Vertex{glm::vec3(0.1f,  0.1f,  0.1f), glm::vec3(0.0f, 1.0f, 0.0f),glm::vec3(1),glm::vec2(1.0f, 1.0f)},
 };
 
 GLuint boxIndices[] =
 {
-	0, 1, 2,
-	0, 2, 3,
-	0, 4, 7,
-	0, 7, 3,
-	3, 7, 6,
-	3, 6, 2,
-	2, 6, 5,
-	2, 5, 1,
-	1, 5, 4,
-	1, 4, 0,
-	4, 5, 6,
-	4, 6, 7
+	0, 1, 2, //bottom front
+	0, 2, 3, //bottom back
+	0, 4, 7, //rear left
+	0, 3, 7, //rear right
+	3, 6, 7, //right top
+	2, 3, 6, //right bottom
+	2, 5, 6, //front right
+	1, 2, 5, //front left
+	1, 4, 5, //left top
+	0, 1, 4, //left bottom
+	4, 5, 6, //top front
+	4, 6, 7 //top back
 };
 
 
