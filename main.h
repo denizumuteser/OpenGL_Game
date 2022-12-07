@@ -1,7 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
-#include "Mesh.h"
-
+//#include "Mesh.h"
+#include "Model.h"
 //#include <irrklang/irrKlang.h>
 
 //music
