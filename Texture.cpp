@@ -19,6 +19,15 @@ Texture::Texture(const char* image, const char* texType, GLuint slot, GLenum for
 	unit = slot;
 	glBindTexture(GL_TEXTURE_2D, ID);
 
+	//testing something
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	//glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, widthImg, heightImg, 0, format, pixelType, bytes);
+
 	// Configures the type of algorithm that is used to make the image smaller or bigger
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -26,7 +35,7 @@ Texture::Texture(const char* image, const char* texType, GLuint slot, GLenum for
 	// Configures the way the texture repeats (if it does at all)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_REPEAT);
 
 	// Extra lines in case you choose to use GL_CLAMP_TO_BORDER
 	// float flatColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -34,7 +43,7 @@ Texture::Texture(const char* image, const char* texType, GLuint slot, GLenum for
 
 	// Assigns the image to the OpenGL Texture object
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, widthImg, heightImg, 0, format, pixelType, bytes);
-	// Generates MipMaps
+	//Generates MipMaps
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	// Deletes the image data as it is already in the OpenGL Texture object

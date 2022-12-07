@@ -15,7 +15,8 @@ int main()
 	{
 		Texture("planks.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE),
 		Texture("planksSpec.png", "specular", 1, GL_RED, GL_UNSIGNED_BYTE),
-		Texture("box.jpg", "diffuse", 2, GL_RGBA, GL_UNSIGNED_BYTE)
+		//Texture("textures/floor/Stylized_Stone_Floor_005_basecolor.jpg", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE),
+		//Texture("textures/floor/Stylized_Stone_Floor_005_roughness.jpg", "specular", 1, GL_RED, GL_UNSIGNED_BYTE),
 	};
 
 	// Generates Shader object using shaders default.vert and default.frag
