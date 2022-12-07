@@ -42,25 +42,30 @@ void Camera::Inputs(GLFWwindow* window)
 	// Handles key inputs
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		Position += speed * Orientation;
+		Position.x += speed * Orientation.x;
+		Position.z += speed * Orientation.z;
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
-		Position += speed * -glm::normalize(glm::cross(Orientation, Up));
+		Position.x += speed * -glm::normalize(glm::cross(Orientation, Up)).x;
+		Position.z += speed * -glm::normalize(glm::cross(Orientation, Up)).z;
+		
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
-		Position += speed * -Orientation;
+		Position.x += speed * -Orientation.x;
+		Position.z += speed * -Orientation.z;
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
-		Position += speed * glm::normalize(glm::cross(Orientation, Up));
+		Position.x += speed * glm::normalize(glm::cross(Orientation, Up)).x;
+		Position.z += speed * glm::normalize(glm::cross(Orientation, Up)).z;
 	}
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && cheat_mode)
 	{
 		Position += speed * Up;
 	}
-	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS && cheat_mode)
 	{
 		Position += speed * -Up;
 	}
@@ -121,8 +126,8 @@ void Camera::Inputs(GLFWwindow* window)
 		float rotY = sensitivity * (float)(mouseX - (width / 2)) / width;
 
 		//freecam
-		if (cheat_mode)
-		{
+		//if (cheat_mode)
+		//{
 			// Calculates upcoming vertical change in the Orientation
 			glm::vec3 newOrientation = glm::rotate(Orientation, glm::radians(-rotX), glm::normalize(glm::cross(Orientation, Up)));
 			// Decides whether or not the next vertical Orientation is legal or not
@@ -130,7 +135,7 @@ void Camera::Inputs(GLFWwindow* window)
 			{
 				Orientation = newOrientation;
 			}
-		}
+		//}
 		
 		// Rotates the Orientation left and right
 		Orientation = glm::rotate(Orientation, glm::radians(-rotY), Up);
