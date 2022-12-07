@@ -184,6 +184,7 @@
     <Image Include="planksSpec.png" />
   </ItemGroup>
   <ItemGroup>
+    <Media Include="shot.mp3" />
     <Media Include="theme.mp3" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

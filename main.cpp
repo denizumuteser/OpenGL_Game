@@ -1,10 +1,10 @@
 #include"Mesh.h"
-#include <irrklang/irrKlang.h>
+//#include <irrklang/irrKlang.h>
 
 //music
-irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
+//irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
 
-const unsigned int width = 800;
+const unsigned int width = 1200;
 const unsigned int height = 9.0/16.0 * width;
 float lastX = width / 2.0f;
 float lastY = height / 2.0f;
@@ -180,7 +180,11 @@ int main()
 	Camera camera(width, height, glm::vec3(0.0f, 0.5f, 0.0f));
 	
 	//init music
-	SoundEngine->play2D("theme.mp3", true);
+	//SoundEngine->play2D("theme.mp3", true);
+
+	//change cursor icon
+	//GLFWcursor* crosshairCursor = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
+	//glfwSetCursor(window, crosshairCursor);
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))

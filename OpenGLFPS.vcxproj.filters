@@ -110,5 +110,8 @@
     <Media Include="theme.mp3">
       <Filter>Resource Files\sounds</Filter>
     </Media>
+    <Media Include="shot.mp3">
+      <Filter>Resource Files\sounds</Filter>
+    </Media>
   </ItemGroup>
 </Project>
