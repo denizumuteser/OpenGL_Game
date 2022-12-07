@@ -1,6 +1,8 @@
 #include"Mesh.h"
+#include <irrklang/irrKlang.h>
 
-
+//music
+irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
 
 const unsigned int width = 800;
 const unsigned int height = 9.0/16.0 * width;
@@ -177,7 +179,8 @@ int main()
 	// Creates camera object
 	Camera camera(width, height, glm::vec3(0.0f, 0.5f, 0.0f));
 	
-
+	//init music
+	SoundEngine->play2D("theme.mp3", true);
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
