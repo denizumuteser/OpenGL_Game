@@ -112,7 +112,7 @@ int main()
 	Camera camera(width, height, glm::vec3(0.0f, 0.2f, 0.0f));
 	
 	//init music
-	SoundEngine->play2D("theme.mp3", true);
+	//SoundEngine->play2D("theme.mp3", true);
 	//change cursor icon
 	//GLFWcursor* crosshairCursor = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
 	//glfwSetCursor(window, crosshairCursor);

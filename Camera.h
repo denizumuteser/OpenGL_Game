@@ -8,7 +8,7 @@
 #include<glm/gtc/type_ptr.hpp>
 #include<glm/gtx/rotate_vector.hpp>
 #include<glm/gtx/vector_angle.hpp>
-#include <irrklang/irrKlang.h>
+//#include <irrklang/irrKlang.h>
 #include"shaderClass.h"
 
 class Camera
@@ -28,7 +28,7 @@ public:
 	int height;
 
 	// Adjust the speed of the camera and it's sensitivity when looking around
-	float speed = 0.001f;
+	float speed = 0.0025f;
 	float sensitivity = 35.0f;
 
 	// Camera constructor to set up initial values
