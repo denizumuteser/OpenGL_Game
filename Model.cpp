@@ -7,9 +7,7 @@ std::vector<Texture> Model::textures_loaded;
 // constructor, expects a filepath to a 3D model.
 Model::Model(const std::string& path)
 {
-    //gammaCorrection = gamma;
     loadModel(path);
-    //std::cout << "number of meshes from model : " << meshes.size() << std::endl;
 }
 
 // draws the model, and thus all its meshes
@@ -17,7 +15,6 @@ void Model::Draw(Shader& shader, Camera& camera)
 {
     for (unsigned int i = 0; i < meshes.size(); i++)
     {
-        //std::cout << "drawing mesh number: " << i << std::endl;
         meshes[i].Draw(shader, camera);
     }
         
@@ -28,7 +25,7 @@ void Model::loadModel(std::string const& path)
 {
     // read file via ASSIMP
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
+    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
     // check for errors
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
     {
@@ -86,9 +83,6 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
             vector.z = mesh->mNormals[i].z;
             vertex.normal = vector;
         }
-        //color TO DELETE
-        //glm::vec3 vector2 = glm::vec3(1.0f);
-        //vertex.color = vector2;
         // texture coordinates
         if (mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
         {
@@ -99,15 +93,15 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
             vec.y = mesh->mTextureCoords[0][i].y;
             vertex.texUV = vec;
             // tangent
-            //vector.x = mesh->mTangents[i].x;
-            //vector.y = mesh->mTangents[i].y;
-            //vector.z = mesh->mTangents[i].z;
-            //Vertex.Tangent = vector;
+            vector.x = mesh->mTangents[i].x;
+            vector.y = mesh->mTangents[i].y;
+            vector.z = mesh->mTangents[i].z;
+            vertex.Tangent = vector;
             // bitangent
-            //vector.x = mesh->mBitangents[i].x;
-            //vector.y = mesh->mBitangents[i].y;
-            //vector.z = mesh->mBitangents[i].z;
-            //Vertex.Bitangent = vector;
+            vector.x = mesh->mBitangents[i].x;
+            vector.y = mesh->mBitangents[i].y;
+            vector.z = mesh->mBitangents[i].z;
+            vertex.Bitangent = vector;
         }
         else
         {
@@ -141,11 +135,11 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
     std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
     textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
     // 3. normal maps
-    //std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "normal");
-    //textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+    std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+    textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
     // 4. height maps
-    //std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "height");
-    //textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
+    std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
+    textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
     // return a mesh object created from the extracted mesh data
     //std::cout << textures.size() << std::endl;

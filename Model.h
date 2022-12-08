@@ -9,6 +9,13 @@
 class Model
 {
 public:
+
+	// model data 
+	static std::vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
+	static std::vector<Mesh> meshes;
+	std::string directory;
+	static bool gammaCorrection;
+
 	// Loads in a model from a file and stores tha information in 'data', 'JSON', and 'file'
 	Model(const std::string& file);
 
@@ -18,19 +25,8 @@ public:
 	Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 	std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type,
 		std::string typeName);
-	std::string directory;
-private:
-	// model data 
-	static std::vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
-
 	
-	//static bool gammaCorrection;
-
-	// Variables for easy access
-	const char* file;
-
-	// All the meshes and transformations
-	static std::vector<Mesh> meshes;
+private:
 
 };
 #endif
