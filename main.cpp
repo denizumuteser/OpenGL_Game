@@ -112,8 +112,7 @@ int main()
 	Camera camera(width, height, glm::vec3(0.0f, 0.2f, 0.0f));
 	
 	//init music
-	//SoundEngine->play2D("theme.mp3", true);
-
+	SoundEngine->play2D("theme.mp3", true);
 	//change cursor icon
 	//GLFWcursor* crosshairCursor = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
 	//glfwSetCursor(window, crosshairCursor);
@@ -122,7 +121,8 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		// Specify the color of the background
-		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+		//glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+		glClearColor(0.53f, 0.80f, 0.92f, 1.0f);
 		// Clean the back buffer and depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

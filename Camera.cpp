@@ -2,6 +2,9 @@
 
 bool cheat_mode = false;
 int KEY_C_LAST_STATE = GLFW_RELEASE;
+int KEY_LEFT_CLICK_LAST_STATE = GLFW_RELEASE;
+
+irrklang::ISoundEngine* SoundEngine2 = irrklang::createIrrKlangDevice();
 
 Camera::Camera(int width, int height, glm::vec3 position)
 {
@@ -103,6 +106,16 @@ void Camera::Inputs(GLFWwindow* window)
 			cheat_mode = true;
 		}
 		KEY_C_LAST_STATE = GLFW_RELEASE;
+	}
+
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && KEY_LEFT_CLICK_LAST_STATE == GLFW_RELEASE)
+	{
+		SoundEngine2->play2D("shot.mp3", false);
+		KEY_LEFT_CLICK_LAST_STATE = GLFW_PRESS;
+	}
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
+	{
+		KEY_LEFT_CLICK_LAST_STATE = GLFW_RELEASE;
 	}
 
 	// Handles mouse inputs

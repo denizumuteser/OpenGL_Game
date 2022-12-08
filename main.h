@@ -2,10 +2,10 @@
 #define MAIN_H
 //#include "Mesh.h"
 #include "Model.h"
-//#include <irrklang/irrKlang.h>
+#include <irrklang/irrKlang.h>
 
 //music
-//irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
+irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
 
 const unsigned int width = 1200;
 const unsigned int height = 9.0 / 16.0 * width;
