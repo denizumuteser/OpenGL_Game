@@ -30,7 +30,7 @@ private:
 	const char* file;
 
 	// All the meshes and transformations
-	static std::vector<Mesh> meshes;
+	std::vector<Mesh> meshes;
 
 };
 #endif

@@ -1,7 +1,7 @@
 #include"Model.h"
 #include <string>
 unsigned int TextureFromFile(const char* path, const std::string& directory, bool gamma = false);
-std::vector<Mesh> Model::meshes;
+//std::vector<Mesh> Model::meshes;
 std::vector<Texture> Model::textures_loaded;
 
 // constructor, expects a filepath to a 3D model.
@@ -166,6 +166,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
         bool skip = false;
         for (unsigned int j = 0; j < textures_loaded.size(); j++)
         {
+
             if (std::strcmp(textures_loaded[j].path, str.C_Str()) == 0)
             {
                 textures.push_back(textures_loaded[j]);
@@ -174,6 +175,8 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
             }
         }
         if (!skip)
+
+            
         {   // if texture hasn't been loaded already, load it
             //Texture texture = Texture(str.C_Str(), typeName.c_str(), 0, GL_RGB, GL_UNSIGNED_BYTE);
             Texture texture;
@@ -192,7 +195,7 @@ unsigned int TextureFromFile(const char* path, const std::string& directory, boo
 {
     std::string filename = std::string(path);
     filename = directory + '/' + filename;
-
+    std::cout << filename << std::endl;
     unsigned int textureID;
     glGenTextures(1, &textureID);
 
