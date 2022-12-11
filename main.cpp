@@ -44,6 +44,8 @@ int main()
 	//shaders
 	Shader mapShader("default.vert", "default.frag");
 	Shader zombieShader("default.vert", "default.frag");
+	Shader zombiesShader("instance.vert", "default.frag");
+
 	//models
 	
 	Model mapModel("models/map2/scene.gltf");
@@ -74,6 +76,9 @@ int main()
 	zombieShader.Activate(); //zombie
 	glUniform4f(glGetUniformLocation(zombieShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	glUniform3f(glGetUniformLocation(zombieShader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
+	zombiesShader.Activate(); 	//zombie instance shader
+	glUniform4f(glGetUniformLocation(zombiesShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	glUniform3f(glGetUniformLocation(zombiesShader.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 
 	// Enables the Depth Buffer
 	glEnable(GL_DEPTH_TEST);
@@ -87,6 +92,64 @@ int main()
 	//GLFWcursor* crosshairCursor = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
 	//glfwSetCursor(window, crosshairCursor);
 
+	//instancing
+	unsigned int number_of_zombies = 100;
+	// Radius of circle around which zombies spawn
+	float radius = 2.0f;
+	// How much position deviate from the radius
+	float radiusDeviation = 0.5f;
+	// Holds all transformations for zombies
+	std::vector <glm::mat4> instanceMatrix;
+
+	for (unsigned int i = 0; i < number_of_zombies; i++)
+	{
+		// Generates x and y for the function x^2 + y^2 = radius^2 which is a circle
+		float x = randf();
+		float finalRadius = radius + randf() * radiusDeviation;
+		float y = ((rand() % 2) * 2 - 1) * sqrt(1.0f - x * x);
+
+
+		// Holds transformations before multiplying them
+		glm::vec3 tempTranslation = glm::vec3(0.2f, 0.085f, 0.0f);
+		glm::quat tempRotation = glm::quat(glm::vec3(glm::radians(-90.0f), 0, 0));
+		glm::vec3 tempScale = glm::vec3(0.007, 0.0070, 0.007);
+
+		// Makes the random distribution more even
+		if (randf() > 0.5f)
+		{
+			// Generates a translation near a circle of radius "radius"
+			tempTranslation = glm::vec3(y * finalRadius, randf(), x * finalRadius);
+			//dont translate on y axis
+			tempTranslation.y = 0.085f;
+
+		}
+		else
+		{
+			// Generates a translation near a circle of radius "radius"
+			tempTranslation = glm::vec3(x * finalRadius, randf(), y * finalRadius);
+			//dont translate on y axis
+			tempTranslation.y = 0.085f;
+		}
+		// Generates random rotations
+		//tempRotation = glm::quat(1.0f, randf(), randf(), randf());
+		// Generates random scales
+		//tempScale = 0.1f * glm::vec3(randf(), randf(), randf());
+		
+		// Initialize matrices
+		glm::mat4 trans = glm::mat4(1.0f);
+		glm::mat4 rot = glm::mat4(1.0f);
+		glm::mat4 sca = glm::mat4(1.0f);
+
+		// Transform the matrices to their correct form
+		trans = glm::translate(trans, tempTranslation);
+		rot = glm::mat4_cast(tempRotation);
+		sca = glm::scale(sca, tempScale);
+
+		// Push matrix transformation
+		instanceMatrix.push_back(trans * rot * sca);
+	}
+	// Create the zombie model with instancing enabled
+	Model zombies(("models/zombie/scene.gltf"), number_of_zombies, instanceMatrix);
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
@@ -112,7 +175,10 @@ int main()
 		
 		//draw models
 		mapModel.Draw(mapShader, camera, glm::vec3(0.0f, -0.0f, 0.0f), glm::quat(0, 0, 0, 0), glm::vec3(0.1, 0.1, 0.1));
-		zombieModel.Draw(zombieShader, camera, glm::vec3(0.2f, 0.085f, 0.0f), glm::quat(myquaternion), glm::vec3(0.0070, 0.0070, 0.0070));
+		zombieModel.Draw(zombieShader, camera, glm::vec3(0.2f, 0.085f, 0.0f), glm::quat(myquaternion), glm::vec3(0.007, 0.0070, 0.007));
+
+		//draw instanced models
+		zombies.Draw(zombiesShader, camera);
 
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
@@ -125,6 +191,7 @@ int main()
 	lightShader.Delete();
 	mapShader.Delete();
 	zombieShader.Delete();
+	zombiesShader.Delete();
 	// Delete window before ending the program
 	glfwDestroyWindow(window);
 	// Terminate GLFW before ending the program

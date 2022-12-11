@@ -87,7 +87,10 @@ GLuint boxIndices[] =
 	4, 6, 7 //top back
 };
 
-
+float randf()
+{
+	return -1.0f + (rand() / (RAND_MAX / 2.0f));
+}
 
 GLFWwindow* initilizeWindow()
 {
