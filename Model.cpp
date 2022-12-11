@@ -5,22 +5,32 @@ unsigned int TextureFromFile(const char* path, const std::string& directory, boo
 std::vector<Texture> Model::textures_loaded;
 
 // constructor, expects a filepath to a 3D model.
-Model::Model(const std::string& path)
+Model::Model(
+    const std::string& path,
+    unsigned int instancing,
+    std::vector<glm::mat4> instanceMatrix)
 {
+    Model::instancing = instancing;
+    Model::instanceMatrix = instanceMatrix;
     //gammaCorrection = gamma;
     loadModel(path);
     //std::cout << "number of meshes from model : " << meshes.size() << std::endl;
 }
 
 // draws the model, and thus all its meshes
-void Model::Draw(Shader& shader, Camera& camera)
+void Model::Draw(
+    Shader& shader,
+    Camera& camera,
+    glm::vec3 translation,
+    glm::quat rotation,
+    glm::vec3 scale)
 {
+
+    // Go over all meshes and draw each one
     for (unsigned int i = 0; i < meshes.size(); i++)
     {
-        //std::cout << "drawing mesh number: " << i << std::endl;
-        meshes[i].Draw(shader, camera);
-    }
-        
+        meshes[i].Draw(shader, camera, glm::mat4(1.0f), translation, rotation, scale);
+    } 
 }
 
 // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
@@ -52,6 +62,7 @@ void Model::processNode(aiNode* node, const aiScene* scene)
         // the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         meshes.push_back(processMesh(mesh, scene));
+        //meshes.push_back(Mesh(vertices, indices, textures, instancing, instanceMatrix));
     }
     // after we've processed all of the meshes (if any) we then recursively process each of the children nodes
     for (unsigned int i = 0; i < node->mNumChildren; i++)
@@ -149,7 +160,8 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 
     // return a mesh object created from the extracted mesh data
     //std::cout << textures.size() << std::endl;
-    return Mesh(vertices, indices, textures);
+    //return Mesh(vertices, indices, textures);
+    return Mesh(vertices, indices, textures, instancing, instanceMatrix);
 }
 
 // checks all material textures of a given type and loads the textures if they're not loaded yet.

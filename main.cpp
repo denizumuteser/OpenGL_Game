@@ -49,9 +49,10 @@ int main()
 	Model ourModel("models/map2/scene.gltf");
 	//Model ourModel("models/crate/scene.gltf");
 	Model ourModel2("models/zombie/scene.gltf");
+
 	//light transform
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, -2.0f);
+	glm::vec3 lightPos = glm::vec3(-0.05f, 0.0f, -0.05f);
 	glm::mat4 lightModel = glm::mat4(1.0f);
 	lightModel = glm::translate(lightModel, lightPos);
 	//lightModel = glm::scale(lightModel, glm::vec3(1,1,1));
@@ -62,39 +63,17 @@ int main()
 	objectModel = glm::translate(objectModel, objectPos);
 	objectModel = glm::scale(objectModel, glm::vec3(10, 10, 10));
 
-	//model
-	glm::vec3 objectPos3 = glm::vec3(-0.2f, -0.1f, -2.0f);
-	//glm::vec3 objectPos3 = glm::vec3(-0.2f, 0.1f, -2.0f);
-	glm::mat4 objectModel3 = glm::mat4(1.0f);
-	objectModel3 = glm::translate(objectModel3, objectPos3);
-	//objectModel3 = glm::scale(objectModel3, glm::vec3(0.008, 0.008, 0.008)); //zombie
-	objectModel3 = glm::scale(objectModel3, glm::vec3(0.1, 0.1, 0.1)); //crate
-	//objectModel3 = glm::scale(objectModel3, glm::vec3(0.1, 0.1, 0.1));
-	//objectModel3 = glm::rotate(objectModel3, glm::radians(-90.0f), glm::vec3(1, 0, 0));
-	objectModel3 = glm::translate(objectModel3, glm::vec3(-0.5f, 1.0f, -2.0f));
-	
-	//model2
-	glm::mat4 objectModel4 = glm::mat4(1.0f);
-	objectModel4 = glm::translate(objectModel4, glm::vec3(-0.5f, 0.085f, -2.0f));
-	objectModel4 = glm::scale(objectModel4, glm::vec3(0.0070, 0.0070, 0.0070)); //zombie
-	objectModel4 = glm::rotate(objectModel4, glm::radians(-90.0f), glm::vec3(1, 0, 0));
-	//objectModel4 = glm::translate(objectModel4, glm::vec3(-0.5f, 0.1f, -2.0f));
-
-	glm::vec3 lightPos2 = glm::vec3(0.05f, 0.05f, -2.0f);
+	glm::vec3 lightPos2 = glm::vec3(0.00f, 0.05f, 0.0f);
 
 	lightShader.Activate(); //light
-	glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
 	glUniform4f(glGetUniformLocation(lightShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	shaderProgram.Activate(); //floor
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "model"), 1, GL_FALSE, glm::value_ptr(objectModel));
 	glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
 	modelShader.Activate(); //model
-	glUniformMatrix4fv(glGetUniformLocation(modelShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(objectModel3));
 	glUniform4f(glGetUniformLocation(modelShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	glUniform3f(glGetUniformLocation(modelShader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
 	modelShader2.Activate(); //model2
-	glUniformMatrix4fv(glGetUniformLocation(modelShader2.ID, "model"), 1, GL_FALSE, glm::value_ptr(objectModel4));
 	glUniform4f(glGetUniformLocation(modelShader2.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	glUniform3f(glGetUniformLocation(modelShader2.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
 
@@ -102,13 +81,14 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 
 	// Creates camera object
-	Camera camera(width, height, glm::vec3(0.0f, 0.2f, 0.0f));
+	Camera camera(width, height, glm::vec3(0.0f, 0.2f, 1.0f));
 	
 	//init music
 	//SoundEngine->play2D("theme.mp3", true);
 	//change cursor icon
 	//GLFWcursor* crosshairCursor = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
 	//glfwSetCursor(window, crosshairCursor);
+
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
@@ -124,12 +104,18 @@ int main()
 		// Updates and exports the camera matrix to the Vertex Shader
 		camera.updateMatrix(45.0f, 0.01f, 100.0f); //modify fov to zoom
 
-		// Draws different meshes
-		floor.Draw(shaderProgram, camera);
-		light.Draw(lightShader, camera);
-		//Box.Draw(shaderProgram2, camera);
-		ourModel.Draw(modelShader, camera);
-		ourModel2.Draw(modelShader2, camera);
+		// Draws meshes
+		floor.Draw(shaderProgram, camera, objectModel);
+		light.Draw(lightShader, camera, lightModel);
+
+
+		//convert zombie roation from euler degrees to euler radians to quaternion rotation
+		glm::quat myquaternion = glm::quat(glm::vec3(glm::radians(-90.0f),0,0));
+		
+		//draw models
+		ourModel.Draw(modelShader, camera, glm::vec3(0.0f, -0.0f, 0.0f), glm::quat(0, 0, 0, 0), glm::vec3(0.1, 0.1, 0.1));
+		ourModel2.Draw(modelShader2, camera, glm::vec3(0.2f, 0.085f, 0.0f), glm::quat(myquaternion), glm::vec3(0.0070, 0.0070, 0.0070));
+
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
 		// Take care of all GLFW events

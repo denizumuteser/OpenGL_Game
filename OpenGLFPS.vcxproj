@@ -166,6 +166,7 @@
   <ItemGroup>
     <None Include="default.frag" />
     <None Include="default.vert" />
+    <None Include="instance.vert" />
     <None Include="light.frag" />
     <None Include="light.vert" />
   </ItemGroup>
