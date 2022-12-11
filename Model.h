@@ -27,6 +27,14 @@ public:
 	std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type,
 		std::string typeName);
 	std::string directory;
+
+	// All the meshes and transformations
+	std::vector<Mesh> meshes;
+	std::vector<glm::vec3> translationsMeshes;
+	std::vector<glm::quat> rotationsMeshes;
+	std::vector<glm::vec3> scalesMeshes;
+	std::vector<glm::mat4> matricesMeshes;
+	std::vector<glm::mat4> instanceMatrix;
 private:
 	// model data 
 	static std::vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
@@ -40,13 +48,8 @@ private:
 	// Variables for easy access
 	const char* file;
 
-	// All the meshes and transformations
-	std::vector<Mesh> meshes;
-	std::vector<glm::vec3> translationsMeshes;
-	std::vector<glm::quat> rotationsMeshes;
-	std::vector<glm::vec3> scalesMeshes;
-	std::vector<glm::mat4> matricesMeshes;
-	std::vector<glm::mat4> instanceMatrix;
+	
+	
 
 	// Loads a single mesh by its index
 	void loadMesh(unsigned int indMesh);

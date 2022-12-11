@@ -47,7 +47,7 @@ int main()
 	Shader zombiesShader("instance.vert", "default.frag");
 
 	//models
-	
+
 	Model mapModel("models/map2/scene.gltf");
 	Model zombieModel("models/zombie/scene.gltf");
 
@@ -76,7 +76,7 @@ int main()
 	zombieShader.Activate(); //zombie
 	glUniform4f(glGetUniformLocation(zombieShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	glUniform3f(glGetUniformLocation(zombieShader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
-	zombiesShader.Activate(); 	//zombie instance shader
+	zombiesShader.Activate(); //zombie instance shader
 	glUniform4f(glGetUniformLocation(zombiesShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	glUniform3f(glGetUniformLocation(zombiesShader.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 
@@ -85,7 +85,7 @@ int main()
 
 	// Creates camera object
 	Camera camera(width, height, glm::vec3(0.0f, 0.2f, 1.0f));
-	
+
 	//init music
 	//SoundEngine->play2D("theme.mp3", true);
 	//change cursor icon
@@ -93,7 +93,8 @@ int main()
 	//glfwSetCursor(window, crosshairCursor);
 
 	//instancing
-	unsigned int number_of_zombies = 100;
+	unsigned int number_of_zombies = 10;
+	std::vector <glm::vec3> zombie_positions;
 	// Radius of circle around which zombies spawn
 	float radius = 2.0f;
 	// How much position deviate from the radius
@@ -134,7 +135,7 @@ int main()
 		//tempRotation = glm::quat(1.0f, randf(), randf(), randf());
 		// Generates random scales
 		//tempScale = 0.1f * glm::vec3(randf(), randf(), randf());
-		
+
 		// Initialize matrices
 		glm::mat4 trans = glm::mat4(1.0f);
 		glm::mat4 rot = glm::mat4(1.0f);
@@ -147,11 +148,15 @@ int main()
 
 		// Push matrix transformation
 		instanceMatrix.push_back(trans * rot * sca);
+		zombie_positions.push_back(tempTranslation);
 	}
 	// Create the zombie model with instancing enabled
 	Model zombies(("models/zombie/scene.gltf"), number_of_zombies, instanceMatrix);
 
 	// Main while loop
+
+	//glm::quat zombie_quat = glm::quat(glm::vec3(glm::radians(-90.0f), 0, 0));
+
 	while (!glfwWindowShouldClose(window))
 	{
 		// Specify the color of the background
@@ -171,12 +176,44 @@ int main()
 
 
 		//convert zombie roation from euler degrees to euler radians to quaternion rotation
-		glm::quat myquaternion = glm::quat(glm::vec3(glm::radians(-90.0f),0,0));
-		
+
+
 		//draw models
 		mapModel.Draw(mapShader, camera, glm::vec3(0.0f, -0.0f, 0.0f), glm::quat(0, 0, 0, 0), glm::vec3(0.1, 0.1, 0.1));
-		zombieModel.Draw(zombieShader, camera, glm::vec3(0.2f, 0.085f, 0.0f), glm::quat(myquaternion), glm::vec3(0.007, 0.0070, 0.007));
+		//zombieModel.Draw(zombieShader, camera, glm::vec3(0.2f, 0.085f, 0.0f), glm::quat(myquaternion), glm::vec3(0.007, 0.0070, 0.007));
 
+		//rotate zombie
+		glm::mat4 lookat = glm::lookAt(
+			glm::vec3(0.2f, 0.085f, 0.0f),
+			glm::vec3(camera.Position.x, 0.085f, -camera.Position.z),
+			glm::vec3(0.0f, 1.0f, 0.0f)
+		);
+		
+		glm::quat zombie_quat = glm::quat(lookat) * glm::quat(glm::vec3(glm::radians(-90.0f), 0, 0));
+
+		zombieModel.Draw(zombieShader, camera, glm::vec3(0.2f, 0.085f, 0.0f), glm::quat(zombie_quat), glm::vec3(0.007, 0.0070, 0.007));
+
+		/*
+		for (int i = 0; i < instanceMatrix.size(); i++)
+		{
+			lookat = glm::lookAt(
+				zombie_positions[i],
+				glm::vec3(camera.Position.x, 0.085f, -camera.Position.z),
+				glm::vec3(0.0f, 1.0f, 0.0f)
+			);
+			// Initialize matrices
+			glm::mat4 trans = glm::mat4(1.0f);
+			glm::mat4 rot = glm::mat4(1.0f);
+			glm::mat4 sca = glm::mat4(1.0f);
+
+			// Transform the matrices to their correct form
+			trans = glm::translate(trans, glm::vec3(0,10,0));
+			rot = glm::mat4_cast(glm::quat(lookat));
+			//sca = glm::scale(sca, tempScale);
+			zombies.instanceMatrix[i] = (trans * rot * sca);
+		}
+		//zombie_quat = glm::quat(angle);
+		*/
 		//draw instanced models
 		zombies.Draw(zombiesShader, camera);
 
