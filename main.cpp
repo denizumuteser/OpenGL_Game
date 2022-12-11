@@ -41,21 +41,19 @@ int main()
 	// Crate light mesh
 	Mesh light(lightVerts, lightInd, tex);
 
-	//model
-	Shader modelShader("default.vert", "default.frag");
-	//model2
-	Shader modelShader2("default.vert", "default.frag");
-	//Model ourModel("models/backpack/backpack.obj");
-	Model ourModel("models/map2/scene.gltf");
-	//Model ourModel("models/crate/scene.gltf");
-	Model ourModel2("models/zombie/scene.gltf");
+	//shaders
+	Shader mapShader("default.vert", "default.frag");
+	Shader zombieShader("default.vert", "default.frag");
+	//models
+	
+	Model mapModel("models/map2/scene.gltf");
+	Model zombieModel("models/zombie/scene.gltf");
 
 	//light transform
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	glm::vec3 lightPos = glm::vec3(-0.05f, 0.0f, -0.05f);
 	glm::mat4 lightModel = glm::mat4(1.0f);
 	lightModel = glm::translate(lightModel, lightPos);
-	//lightModel = glm::scale(lightModel, glm::vec3(1,1,1));
 
 	//floor transform
 	glm::vec3 objectPos = glm::vec3(0.0f, -0.11f, 0.0f);
@@ -70,12 +68,12 @@ int main()
 	shaderProgram.Activate(); //floor
 	glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
-	modelShader.Activate(); //model
-	glUniform4f(glGetUniformLocation(modelShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-	glUniform3f(glGetUniformLocation(modelShader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
-	modelShader2.Activate(); //model2
-	glUniform4f(glGetUniformLocation(modelShader2.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-	glUniform3f(glGetUniformLocation(modelShader2.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
+	mapShader.Activate(); //map
+	glUniform4f(glGetUniformLocation(mapShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	glUniform3f(glGetUniformLocation(mapShader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
+	zombieShader.Activate(); //zombie
+	glUniform4f(glGetUniformLocation(zombieShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	glUniform3f(glGetUniformLocation(zombieShader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
 
 	// Enables the Depth Buffer
 	glEnable(GL_DEPTH_TEST);
@@ -113,8 +111,8 @@ int main()
 		glm::quat myquaternion = glm::quat(glm::vec3(glm::radians(-90.0f),0,0));
 		
 		//draw models
-		ourModel.Draw(modelShader, camera, glm::vec3(0.0f, -0.0f, 0.0f), glm::quat(0, 0, 0, 0), glm::vec3(0.1, 0.1, 0.1));
-		ourModel2.Draw(modelShader2, camera, glm::vec3(0.2f, 0.085f, 0.0f), glm::quat(myquaternion), glm::vec3(0.0070, 0.0070, 0.0070));
+		mapModel.Draw(mapShader, camera, glm::vec3(0.0f, -0.0f, 0.0f), glm::quat(0, 0, 0, 0), glm::vec3(0.1, 0.1, 0.1));
+		zombieModel.Draw(zombieShader, camera, glm::vec3(0.2f, 0.085f, 0.0f), glm::quat(myquaternion), glm::vec3(0.0070, 0.0070, 0.0070));
 
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
@@ -125,8 +123,8 @@ int main()
 	// Delete all the objects we've created
 	shaderProgram.Delete();
 	lightShader.Delete();
-	modelShader.Delete();
-	modelShader2.Delete();
+	mapShader.Delete();
+	zombieShader.Delete();
 	// Delete window before ending the program
 	glfwDestroyWindow(window);
 	// Terminate GLFW before ending the program
