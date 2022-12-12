@@ -1,0 +1,11 @@
+Model Information:
+* title:	Minecraft Zombie
+* source:	https://sketchfab.com/3d-models/minecraft-zombie-6a9c56f8020e4008a9afb4427ff8f782
+* author:	None (https://sketchfab.com/None_Yaroslav)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Minecraft Zombie" (https://sketchfab.com/3d-models/minecraft-zombie-6a9c56f8020e4008a9afb4427ff8f782) by None (https://sketchfab.com/None_Yaroslav) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

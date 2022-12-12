@@ -19,16 +19,55 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 Vertex vertices[] = //floor
 { //               COORDINATES           /            NORMALS          /       COLOR        //           TexCoord         /
 	Vertex{glm::vec3(-1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(0.0f, 0.0f)},
-	Vertex{glm::vec3(-1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(0.0f, 100.0f)},
-	Vertex{glm::vec3(1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(100.0f, 100.0f)},
-	Vertex{glm::vec3(1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(100.0f, 0.0f)}
+	Vertex{glm::vec3(-1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(0.0f, 4.0f)},
+	Vertex{glm::vec3(1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(4.0f, 4.0f)},
+	Vertex{glm::vec3(1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(4.0f, 0.0f)}
+};
+
+Vertex vertices2[] = //wall
+{ //               COORDINATES           /            NORMALS          /       COLOR        //           TexCoord         /
+	Vertex{glm::vec3(-1.0f, 0.0f,  1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1), glm::vec2(0.0f, 0.0f)},
+	Vertex{glm::vec3(-1.0f, 0.0f, -1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1), glm::vec2(2.0f, 0.0f)},
+	Vertex{glm::vec3(-1.0f, 0.25f,  1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1), glm::vec2(0.0f, 0.5f)},
+	Vertex{glm::vec3(-1.0f, 0.25f, -1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1), glm::vec2(2.0f, 0.5f)},
+	
+	Vertex{glm::vec3(1.0f, 0.0f,  1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1), glm::vec2(0.0f, 0.0f)},
+	Vertex{glm::vec3(1.0f, 0.0f, -1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1), glm::vec2(2.0f, 0.0f)},
+	Vertex{glm::vec3(1.0f, 0.25f,  1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1), glm::vec2(0.0f, 0.5f)},
+	Vertex{glm::vec3(1.0f, 0.25f, -1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1), glm::vec2(2.0f, 0.5f)},
+
+	Vertex{glm::vec3(-1.0f, 0.0f,  -1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1), glm::vec2(0.0f, 0.0f)},
+	Vertex{glm::vec3(1.0f, 0.0f,  -1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1), glm::vec2(2.0f, 0.0f)},
+	Vertex{glm::vec3(-1.0f, 0.25f,  -1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1), glm::vec2(0.0f, 0.5f)},
+	Vertex{glm::vec3(1.0f, 0.25f,  -1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1), glm::vec2(2.0f, 0.5f)},
+
+	Vertex{glm::vec3(-1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(1), glm::vec2(0.0f, 0.0f)},
+	Vertex{glm::vec3(1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(1), glm::vec2(2.0f, 0.0f)},
+	Vertex{glm::vec3(-1.0f, 0.25f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(1), glm::vec2(0.0f, 0.5f)},
+	Vertex{glm::vec3(1.0f, 0.25f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(1), glm::vec2(2.0f, 0.5f)},
 };
 
 // Indices for vertices order
 GLuint indices[] =
 {
 	0, 1, 2,
-	0, 2, 3
+	0, 2, 3,
+};
+
+GLuint indices2[] =
+{
+	0, 1, 2,
+	1, 2, 3,
+
+	5,4,7,
+	4,7,6,
+
+	8, 9, 11,
+	8,10, 11,
+
+	12,13,15,
+	12,14,15
+
 };
 
 Vertex lightVertices[] =
