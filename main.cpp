@@ -10,28 +10,37 @@ int main()
 		return -1;
 	}
 
-	// Texture data
-	Texture textures[]
-	{
-		Texture("textures/floor2/Stone_Floor_006_basecolor.jpg", "diffuse", 0, GL_RGB, GL_UNSIGNED_BYTE),
-		Texture("textures/floor2/Stone_Floor_006_roughness.jpg", "specular", 1, GL_RED, GL_UNSIGNED_BYTE),
-	};
 
 	// Texture data
-	Texture BoxTextures[]
+	Texture texturesWalls[]
 	{
-		Texture("textures/wood/Wood_025_basecolor.jpg", "diffuse", 0, GL_RGB, GL_UNSIGNED_BYTE),
-		Texture("textures/wood/Wood_025_roughness.jpg", "specular", 1, GL_RED, GL_UNSIGNED_BYTE),
+		Texture("textures/wall/Brick_Wall_019_BaseColor.jpg", "diffuse", 0, GL_RGB, GL_UNSIGNED_BYTE),
+		Texture("textures/wall/Brick_Wall_019_Roughness.jpg", "specular", 1, GL_RED, GL_UNSIGNED_BYTE),
+	};
+	Texture texturesFloor[]
+	{
+		Texture("textures/Floor/planks.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE),
+		Texture("textures/Floor/planksSpec.png", "specular", 1, GL_RED, GL_UNSIGNED_BYTE),
 	};
 
 	// Generates Shader object using shaders default.vert and default.frag
-	Shader shaderProgram("default.vert", "default.frag");
+	//floor
+	Shader shaderProgramFloor("default.vert", "default.frag");
 	// Store mesh data in vectors for the mesh
-	std::vector <Vertex> verts(vertices, vertices + sizeof(vertices) / sizeof(Vertex));
-	std::vector <GLuint> ind(indices, indices + sizeof(indices) / sizeof(GLuint));
-	std::vector <Texture> tex(textures, textures + sizeof(textures) / sizeof(Texture));
+	std::vector <Vertex> verts(verticesFloor, verticesFloor + sizeof(verticesFloor) / sizeof(Vertex));
+	std::vector <GLuint> ind(indicesFloor, indicesFloor + sizeof(indicesFloor) / sizeof(GLuint));
+	std::vector <Texture> tex(texturesFloor, texturesFloor + sizeof(texturesFloor) / sizeof(Texture));
 	// Create floor mesh
 	Mesh floor(verts, ind, tex);
+
+	//walls
+	Shader shaderProgramWalls("default.vert", "default.frag");
+	// Store mesh data in vectors for the mesh
+	std::vector <Vertex> verts2(verticesWalls, verticesWalls + sizeof(verticesWalls) / sizeof(Vertex));
+	std::vector <GLuint> ind2(indicesWalls, indicesWalls + sizeof(indicesWalls) / sizeof(GLuint));
+	std::vector <Texture> tex2(texturesWalls, texturesWalls + sizeof(texturesWalls) / sizeof(Texture));
+	Mesh walls(verts2, ind2, tex2);
+
 
 	// Shader for light cube
 	Shader lightShader("light.vert", "light.frag");
@@ -61,15 +70,25 @@ int main()
 	glm::vec3 objectPos = glm::vec3(0.0f, -0.11f, 0.0f);
 	glm::mat4 objectModel = glm::mat4(1.0f);
 	objectModel = glm::translate(objectModel, objectPos);
-	objectModel = glm::scale(objectModel, glm::vec3(10, 10, 10));
+	objectModel = glm::scale(objectModel, glm::vec3(5, 5, 5));
+
+	//wall transform
+	glm::vec3 objectPos2 = glm::vec3(0.0f, -0.0f, 0.0f);
+	glm::mat4 objectModel2 = glm::mat4(1.0f);
+	objectModel2 = glm::translate(objectModel2, objectPos2);
+	objectModel2 = glm::scale(objectModel2, glm::vec3(1, 1, 1));
 
 	glm::vec3 lightPos2 = glm::vec3(0.00f, 0.05f, 0.0f);
 
 	lightShader.Activate(); //light
 	glUniform4f(glGetUniformLocation(lightShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-	shaderProgram.Activate(); //floor
-	glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-	glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
+	shaderProgramFloor.Activate(); //floor
+	glUniform4f(glGetUniformLocation(shaderProgramFloor.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	glUniform3f(glGetUniformLocation(shaderProgramFloor.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
+	shaderProgramWalls.Activate(); //walls
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgramWalls.ID, "model"), 1, GL_FALSE, glm::value_ptr(objectModel2));
+	glUniform4f(glGetUniformLocation(shaderProgramWalls.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	glUniform3f(glGetUniformLocation(shaderProgramWalls.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
 	mapShader.Activate(); //map
 	glUniform4f(glGetUniformLocation(mapShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	glUniform3f(glGetUniformLocation(mapShader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
@@ -171,7 +190,8 @@ int main()
 		camera.updateMatrix(45.0f, 0.01f, 100.0f); //modify fov to zoom
 
 		// Draws meshes
-		floor.Draw(shaderProgram, camera, objectModel);
+		floor.Draw(shaderProgramFloor, camera, objectModel);
+		walls.Draw(shaderProgramWalls, camera, objectModel);
 		light.Draw(lightShader, camera, lightModel);
 
 
@@ -224,7 +244,8 @@ int main()
 	}
 
 	// Delete all the objects we've created
-	shaderProgram.Delete();
+	shaderProgramFloor.Delete();
+	shaderProgramWalls.Delete();
 	lightShader.Delete();
 	mapShader.Delete();
 	zombieShader.Delete();

@@ -16,16 +16,16 @@ bool firstMouse = true;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 // Vertices coordinates
-Vertex vertices[] = //floor
+Vertex verticesFloor[] = //floor
 { //               COORDINATES           /            NORMALS          /       COLOR        //           TexCoord         /
 	Vertex{glm::vec3(-1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(0.0f, 0.0f)},
-	Vertex{glm::vec3(-1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(0.0f, 100.0f)},
-	Vertex{glm::vec3(1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(100.0f, 100.0f)},
-	Vertex{glm::vec3(1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(100.0f, 0.0f)}
+	Vertex{glm::vec3(-1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(0.0f, 10.0f)},
+	Vertex{glm::vec3(1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(10.0f, 10.0f)},
+	Vertex{glm::vec3(1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(10.0f, 0.0f)}
 };
 
 // Indices for vertices order
-GLuint indices[] =
+GLuint indicesFloor[] =
 {
 	0, 1, 2,
 	0, 2, 3
@@ -85,6 +85,45 @@ GLuint boxIndices[] =
 	0, 1, 4, //left bottom
 	4, 5, 6, //top front
 	4, 6, 7 //top back
+};
+
+Vertex verticesWalls[] = //wall
+{ //               COORDINATES           /            NORMALS          /       COLOR        //           TexCoord         /
+	Vertex{glm::vec3(-1.0f, 0.0f,  1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1), glm::vec2(0.0f, 0.0f)},
+	Vertex{glm::vec3(-1.0f, 0.0f, -1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1), glm::vec2(5.0f, 0.0f)},
+	Vertex{glm::vec3(-1.0f, 0.25f,  1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1), glm::vec2(0.0f, 2.0f)},
+	Vertex{glm::vec3(-1.0f, 0.25f, -1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1), glm::vec2(5.0f, 2.0f)},
+
+	Vertex{glm::vec3(1.0f, 0.0f,  1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1), glm::vec2(0.0f, 0.0f)},
+	Vertex{glm::vec3(1.0f, 0.0f, -1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1), glm::vec2(5.0f, 0.0f)},
+	Vertex{glm::vec3(1.0f, 0.25f,  1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1), glm::vec2(0.0f, 2.0f)},
+	Vertex{glm::vec3(1.0f, 0.25f, -1.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1), glm::vec2(5.0f, 2.0f)},
+
+	Vertex{glm::vec3(-1.0f, 0.0f,  -1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1), glm::vec2(0.0f, 0.0f)},
+	Vertex{glm::vec3(1.0f, 0.0f,  -1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1), glm::vec2(5.0f, 0.0f)},
+	Vertex{glm::vec3(-1.0f, 0.25f,  -1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1), glm::vec2(0.0f, 2.0f)},
+	Vertex{glm::vec3(1.0f, 0.25f,  -1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1), glm::vec2(5.0f, 2.0f)},
+
+	Vertex{glm::vec3(-1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(1), glm::vec2(0.0f, 0.0f)},
+	Vertex{glm::vec3(1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(1), glm::vec2(5.0f, 0.0f)},
+	Vertex{glm::vec3(-1.0f, 0.25f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(1), glm::vec2(0.0f, 2.0f)},
+	Vertex{glm::vec3(1.0f, 0.25f,  1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(1), glm::vec2(5.0f, 2.0f)},
+};
+
+GLuint indicesWalls[] =
+{
+	0, 1, 2,
+	1, 2, 3,
+
+	5,4,7,
+	4,7,6,
+
+	8, 9, 11,
+	8,10, 11,
+
+	12,13,15,
+	12,14,15
+
 };
 
 float randf()
