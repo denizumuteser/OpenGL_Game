@@ -1,4 +1,5 @@
 #include "main.h"
+#include <random>
 
 int main()
 {
@@ -52,7 +53,6 @@ int main()
 	//shaders
 	Shader mapShader("default.vert", "default.frag");
 	Shader zombieShader("default.vert", "default.frag");
-	Shader zombiesShader("instance.vert", "default.frag");
 
 	//models
 
@@ -94,9 +94,6 @@ int main()
 	zombieShader.Activate(); //zombie
 	glUniform4f(glGetUniformLocation(zombieShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	glUniform3f(glGetUniformLocation(zombieShader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
-	zombiesShader.Activate(); //zombie instance shader
-	glUniform4f(glGetUniformLocation(zombiesShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-	glUniform3f(glGetUniformLocation(zombiesShader.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 
 	// Enables the Depth Buffer
 	glEnable(GL_DEPTH_TEST);
@@ -113,67 +110,31 @@ int main()
 	//instancing
 	unsigned int number_of_zombies = 10;
 	std::vector <glm::vec3> zombie_positions;
-	// Radius of circle around which zombies spawn
-	float radius = 2.0f;
-	// How much position deviate from the radius
-	float radiusDeviation = 0.5f;
-	// Holds all transformations for zombies
-	std::vector <glm::mat4> instanceMatrix;
 
-	for (unsigned int i = 0; i < number_of_zombies; i++)
+	std::vector <Model> zombies;
+	std::vector <Shader> zombiesShaders;
+
+	std::default_random_engine generator;
+	std::uniform_int_distribution<int> distribution(-30, 30);
+	
+	for (int i = 0; i < number_of_zombies; i++)
 	{
-		// Generates x and y for the function x^2 + y^2 = radius^2 which is a circle
-		float x = randf();
-		float finalRadius = radius + randf() * radiusDeviation;
-		float y = ((rand() % 2) * 2 - 1) * sqrt(1.0f - x * x);
+		zombiesShaders.push_back(Shader("default.vert", "default.frag"));
+		zombies.push_back(Model("models/zombie/scene.gltf"));
 
+		glm::vec3 test = glm::vec3(distribution(generator) / 10.0f, 0.085f, distribution(generator) / 10.0f);
 
-		// Holds transformations before multiplying them
-		glm::vec3 tempTranslation = glm::vec3(0.2f, 0.085f, 0.0f);
-		glm::quat tempRotation = glm::quat(glm::vec3(glm::radians(-90.0f), 0, 0));
-		glm::vec3 tempScale = glm::vec3(0.007, 0.0070, 0.007);
+		zombie_positions.push_back(test);
 
-		// Makes the random distribution more even
-		if (randf() > 0.5f)
-		{
-			// Generates a translation near a circle of radius "radius"
-			tempTranslation = glm::vec3(y * finalRadius, randf(), x * finalRadius);
-			//dont translate on y axis
-			tempTranslation.y = 0.085f;
+		std::cout << test.x << "/" << test.y << "/" << test.z << std::endl;
 
-		}
-		else
-		{
-			// Generates a translation near a circle of radius "radius"
-			tempTranslation = glm::vec3(x * finalRadius, randf(), y * finalRadius);
-			//dont translate on y axis
-			tempTranslation.y = 0.085f;
-		}
-		// Generates random rotations
-		//tempRotation = glm::quat(1.0f, randf(), randf(), randf());
-		// Generates random scales
-		//tempScale = 0.1f * glm::vec3(randf(), randf(), randf());
-
-		// Initialize matrices
-		glm::mat4 trans = glm::mat4(1.0f);
-		glm::mat4 rot = glm::mat4(1.0f);
-		glm::mat4 sca = glm::mat4(1.0f);
-
-		// Transform the matrices to their correct form
-		trans = glm::translate(trans, tempTranslation);
-		rot = glm::mat4_cast(tempRotation);
-		sca = glm::scale(sca, tempScale);
-
-		// Push matrix transformation
-		instanceMatrix.push_back(trans * rot * sca);
-		zombie_positions.push_back(tempTranslation);
+		zombiesShaders[i].Activate(); //zombie
+		glUniform4f(glGetUniformLocation(zombiesShaders[i].ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+		glUniform3f(glGetUniformLocation(zombiesShaders[i].ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
+		
 	}
-	// Create the zombie model with instancing enabled
-	Model zombies(("models/zombie/scene.gltf"), number_of_zombies, instanceMatrix);
 
-	// Main while loop
 
-	//glm::quat zombie_quat = glm::quat(glm::vec3(glm::radians(-90.0f), 0, 0));
 
 	double prevTime = 0.0;
 	double crntTime = 0.0;
@@ -250,10 +211,6 @@ int main()
 		walls.Draw(shaderProgramWalls, camera, objectModel);
 		light.Draw(lightShader, camera, lightModel);
 
-
-		//convert zombie roation from euler degrees to euler radians to quaternion rotation
-
-
 		//draw models
 		mapModel.Draw(mapShader, camera, glm::vec3(0.0f, -0.0f, 0.0f), glm::quat(0, 0, 0, 0), glm::vec3(0.1, 0.1, 0.1));
 		//zombieModel.Draw(zombieShader, camera, glm::vec3(0.2f, 0.085f, 0.0f), glm::quat(myquaternion), glm::vec3(0.007, 0.0070, 0.007));
@@ -266,35 +223,27 @@ int main()
 		);
 		
 		glm::quat zombie_quat = glm::quat(lookat) * glm::quat(glm::vec3(glm::radians(-90.0f), 0, 0));
-
+		//std::cout << zombie_quat.w << "/" << zombie_quat.x << "/" << zombie_quat.y << "/" << zombie_quat.z << "/" << std::endl;
 		zombieModel.Draw(zombieShader, camera, glm::vec3(0.2f, 0.085f, 0.0f), glm::quat(zombie_quat), glm::vec3(0.007, 0.0070, 0.007));
 
-		/*
-		for (int i = 0; i < instanceMatrix.size(); i++)
+		for (int i = 0; i < number_of_zombies; i++)
 		{
-			lookat = glm::lookAt(
-				zombie_positions[i],
+			glm::mat4 lookat2 = glm::lookAt(
+				glm::vec3(zombie_positions[i].x, zombie_positions[i].y, -zombie_positions[i].z),
 				glm::vec3(camera.Position.x, 0.085f, -camera.Position.z),
 				glm::vec3(0.0f, 1.0f, 0.0f)
 			);
-			// Initialize matrices
-			glm::mat4 trans = glm::mat4(1.0f);
-			glm::mat4 rot = glm::mat4(1.0f);
-			glm::mat4 sca = glm::mat4(1.0f);
 
-			// Transform the matrices to their correct form
-			trans = glm::translate(trans, glm::vec3(0,10,0));
-			rot = glm::mat4_cast(glm::quat(lookat));
-			//sca = glm::scale(sca, tempScale);
-			zombies.instanceMatrix[i] = (trans * rot * sca);
+			glm::quat zombie_quat2 = glm::quat(lookat2) * glm::quat(glm::vec3(glm::radians(-90.0f), 0, 0));
+			//std::cout << zombie_quat2.w << "/" << zombie_quat2.x << "/" << zombie_quat2.y << "/" << zombie_quat2.z << "/" << std::endl;
+			std::cout << camera.Position.x << "   " << camera.Position.z << std::endl;
+
+			zombies[i].Draw(zombiesShaders[i], camera, zombie_positions[i], glm::quat(zombie_quat2), glm::vec3(0.007, 0.0070, 0.007));
 		}
-		//zombie_quat = glm::quat(angle);
-		*/
-		//draw instanced models
-		zombies.Draw(zombiesShader, camera);
+
+		//std::cout << zombies.meshes.size() << std::endl;
 
 		//crosshair
-		// bind Texture
 		textureCrosshair.Bind();
 
 		// render container
@@ -318,7 +267,10 @@ int main()
 	lightShader.Delete();
 	mapShader.Delete();
 	zombieShader.Delete();
-	zombiesShader.Delete();
+	for (int i = 0; i < zombiesShaders.size(); i++)
+	{
+		zombiesShaders[i].Delete();
+	}
 	// Delete window before ending the program
 	glfwDestroyWindow(window);
 	// Terminate GLFW before ending the program
