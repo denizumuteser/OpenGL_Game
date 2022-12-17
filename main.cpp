@@ -108,7 +108,7 @@ int main()
 	//glfwSetCursor(window, crosshairCursor);
 
 	//instancing
-	unsigned int number_of_zombies = 10;
+	unsigned int number_of_zombies = 100;
 	std::vector <glm::vec3> zombie_positions;
 
 	std::vector <Model> zombies;
@@ -126,7 +126,7 @@ int main()
 
 		zombie_positions.push_back(test);
 
-		std::cout << test.x << "/" << test.y << "/" << test.z << std::endl;
+		//std::cout << test.x << "/" << test.y << "/" << test.z << std::endl;
 
 		zombiesShaders[i].Activate(); //zombie
 		glUniform4f(glGetUniformLocation(zombiesShaders[i].ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
@@ -236,7 +236,7 @@ int main()
 
 			glm::quat zombie_quat2 = glm::quat(lookat2) * glm::quat(glm::vec3(glm::radians(-90.0f), 0, 0));
 			//std::cout << zombie_quat2.w << "/" << zombie_quat2.x << "/" << zombie_quat2.y << "/" << zombie_quat2.z << "/" << std::endl;
-			std::cout << camera.Position.x << "   " << camera.Position.z << std::endl;
+			//std::cout << camera.Position.x << "   " << camera.Position.z << std::endl;
 
 			zombies[i].Draw(zombiesShaders[i], camera, zombie_positions[i], glm::quat(zombie_quat2), glm::vec3(0.007, 0.0070, 0.007));
 		}
