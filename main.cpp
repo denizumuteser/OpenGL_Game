@@ -204,6 +204,33 @@ int main()
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 	
+	//End screen
+	Shader EndScreenShader("ui.vert", "ui.frag");
+	Texture endScreen = Texture("textures/ui/you-died.png", 0, GL_RGB, GL_UNSIGNED_BYTE);
+
+	unsigned int VBO4, VAO4, EBO4;
+	glGenVertexArrays(1, &VAO4);
+	glGenBuffers(1, &VBO4);
+	glGenBuffers(1, &EBO4);
+
+	glBindVertexArray(VAO4);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO4);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesCrosshair), verticesCrosshair, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO4);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicesCrosshair), indicesCrosshair, GL_STATIC_DRAW);
+
+	// position attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	// color attribute
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	// texture coord attribute
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
 	glm::mat4 modelOrtho(1.0f);
 	glm::mat4 viewOrtho(1.0f);
 	glm::mat4 projectionOrtho(1.0f);
@@ -214,6 +241,8 @@ int main()
 
 	glm::mat4 viewOrthoHeart = glm::translate(viewOrtho, glm::vec3(0.85f, 0.9f, 0.0f));
 	viewOrthoHeart = glm::scale(viewOrthoHeart, glm::vec3(1.35f, 0.8f, 1.0f));
+
+	glm::mat4 viewOrthoEndScreen = glm::scale(viewOrtho, glm::vec3(10.0f, 10.0f, 1.0f));
 
 	int playerHealth = 3;
 
@@ -237,7 +266,6 @@ int main()
 		}
 
 		// Specify the color of the background
-		//glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		glClearColor(0.53f, 0.80f, 0.92f, 1.0f);
 		// Clean the back buffer and depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -253,7 +281,6 @@ int main()
 
 		//draw models
 		mapModel.Draw(mapShader, camera, glm::vec3(0.0f, -0.0f, 0.0f), glm::quat(0, 0, 0, 0), glm::vec3(0.1, 0.1, 0.1));
-		//zombieModel.Draw(zombieShader, camera, glm::vec3(0.2f, 0.085f, 0.0f), glm::quat(myquaternion), glm::vec3(0.007, 0.0070, 0.007));
 
 		//rotate zombie
 		glm::mat4 lookat = glm::lookAt(
@@ -263,7 +290,6 @@ int main()
 		);
 		
 		glm::quat zombie_quat = glm::quat(lookat) * glm::quat(glm::vec3(glm::radians(-90.0f), 0, 0));
-		//std::cout << zombie_quat.w << "/" << zombie_quat.x << "/" << zombie_quat.y << "/" << zombie_quat.z << "/" << std::endl;
 		zombieModel.Draw(zombieShader, camera, glm::vec3(0.2f, 0.085f, 0.0f), glm::quat(zombie_quat), glm::vec3(0.007, 0.0070, 0.007));
 
 		for (int i = 0; i < zombies.size(); i++)
@@ -275,9 +301,6 @@ int main()
 			);
 
 			glm::quat zombie_quat2 = glm::quat(lookat2) * glm::quat(glm::vec3(glm::radians(-90.0f), 0, 0));
-			//std::cout << zombie_quat2.w << "/" << zombie_quat2.x << "/" << zombie_quat2.y << "/" << zombie_quat2.z << "/" << std::endl;
-			//std::cout << camera.Position.x << "   " << camera.Position.z << std::endl;
-
 
 			glm::vec3 directionToCamera = glm::normalize(camera.Position - zombie_positions[i]);
 			//move zombies
@@ -308,16 +331,21 @@ int main()
 
 		//std::cout << zombies.meshes.size() << std::endl;
 
-		//crosshair
-		textureCrosshair.Bind();
 
-		// render crosshair
-		CrosshairShader.Activate();
-		glBindVertexArray(VAO2);
-		glUniformMatrix4fv(glGetUniformLocation(CrosshairShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projectionOrtho));
-		glUniformMatrix4fv(glGetUniformLocation(CrosshairShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(modelOrtho));
-		glUniformMatrix4fv(glGetUniformLocation(CrosshairShader.ID, "view"), 1, GL_FALSE, glm::value_ptr(viewOrthoCrosshair));
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		//dont render health when dead
+		if (playerHealth > 0)
+		{
+			//crosshair
+			textureCrosshair.Bind();
+
+			// render crosshair
+			CrosshairShader.Activate();
+			glBindVertexArray(VAO2);
+			glUniformMatrix4fv(glGetUniformLocation(CrosshairShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projectionOrtho));
+			glUniformMatrix4fv(glGetUniformLocation(CrosshairShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(modelOrtho));
+			glUniformMatrix4fv(glGetUniformLocation(CrosshairShader.ID, "view"), 1, GL_FALSE, glm::value_ptr(viewOrthoCrosshair));
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		}
 
 		//heart according to player health level
 		if (playerHealth == 3)
@@ -334,7 +362,7 @@ int main()
 		}
 		else
 		{
-			//DEAD
+			//DIED NOW
 		}
 		//dont render health when dead
 		if (playerHealth > 0)
@@ -345,6 +373,17 @@ int main()
 			glUniformMatrix4fv(glGetUniformLocation(HeartShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projectionOrtho));
 			glUniformMatrix4fv(glGetUniformLocation(HeartShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(modelOrtho));
 			glUniformMatrix4fv(glGetUniformLocation(HeartShader.ID, "view"), 1, GL_FALSE, glm::value_ptr(viewOrthoHeart));
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		}
+		else
+		{	//CURRENTLY DEAD
+			// render ending screen
+			endScreen.Bind();
+			EndScreenShader.Activate();
+			glBindVertexArray(VAO4);
+			glUniformMatrix4fv(glGetUniformLocation(EndScreenShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projectionOrtho));
+			glUniformMatrix4fv(glGetUniformLocation(EndScreenShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(modelOrtho));
+			glUniformMatrix4fv(glGetUniformLocation(EndScreenShader.ID, "view"), 1, GL_FALSE, glm::value_ptr(viewOrthoEndScreen));
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}
 		

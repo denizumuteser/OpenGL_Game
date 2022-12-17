@@ -73,7 +73,6 @@ Texture::Texture(const char* image, GLuint slot, GLenum format, GLenum pixelType
 			format = GL_RGB;
 		else if (nrComponents == 4)
 			format = GL_RGBA;
-		std::cout << nrComponents << std::endl;
 
 		glBindTexture(GL_TEXTURE_2D, ID);
 
