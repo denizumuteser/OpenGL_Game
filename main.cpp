@@ -176,16 +176,38 @@ int main()
 
 	//glm::quat zombie_quat = glm::quat(glm::vec3(glm::radians(-90.0f), 0, 0));
 
+	double prevTime = 0.0;
+	double crntTime = 0.0;
+	double timeDiff;
+	unsigned int counter = 0;
+
+
 	while (!glfwWindowShouldClose(window))
 	{
+
+		//fps
+		crntTime = glfwGetTime();
+		timeDiff = crntTime - prevTime;
+		counter++;
+		if (timeDiff >= 1.0 / 60.0)
+		{
+			std::string FPS = std::to_string((1.0 / timeDiff) * counter);
+			std::string ms = std::to_string((timeDiff / counter) * 1000);
+			std::string newTitle = "FPS: " + FPS + " ms: " + ms;
+			glfwSetWindowTitle(window, newTitle.c_str());
+			prevTime = crntTime;
+			counter = 0;
+			// Handles camera inputs
+			camera.Inputs(window);
+		}
+
 		// Specify the color of the background
 		//glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		glClearColor(0.53f, 0.80f, 0.92f, 1.0f);
 		// Clean the back buffer and depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// Handles camera inputs
-		camera.Inputs(window);
+		
 		// Updates and exports the camera matrix to the Vertex Shader
 		camera.updateMatrix(45.0f, 0.01f, 100.0f); //modify fov to zoom
 
@@ -236,6 +258,8 @@ int main()
 		*/
 		//draw instanced models
 		zombies.Draw(zombiesShader, camera);
+
+
 
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
