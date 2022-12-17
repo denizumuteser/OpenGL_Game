@@ -15,6 +15,20 @@ bool firstMouse = true;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
+
+float verticesCrosshair[] = {
+	// positions          // colors           // texture coords
+	 0.1f,  0.1f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+	 0.1f, -0.1f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+	-0.1f, -0.1f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+	-0.1f,  0.1f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+};
+
+unsigned int indicesCrosshair[] = {
+		0, 1, 3, // first triangle
+		1, 2, 3  // second triangle
+};
+
 // Vertices coordinates
 Vertex verticesFloor[] = //floor
 { //               COORDINATES           /            NORMALS          /       COLOR        //           TexCoord         /
