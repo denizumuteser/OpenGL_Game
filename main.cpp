@@ -173,6 +173,36 @@ int main()
 	// texture coord attribute
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
+
+	//Heart
+	Shader HeartShader("ui.vert", "ui.frag");
+
+	Texture textureHeart1 = Texture("textures/ui/heart-1.png", 0, GL_RGBA, GL_UNSIGNED_BYTE);
+	Texture textureHeart2 = Texture("textures/ui/heart-2.png", 0, GL_RGBA, GL_UNSIGNED_BYTE);
+	Texture textureHeart3 = Texture("textures/ui/heart-3.png", 0, GL_RGBA, GL_UNSIGNED_BYTE);
+
+	unsigned int VBO3, VAO3, EBO3;
+	glGenVertexArrays(1, &VAO3);
+	glGenBuffers(1, &VBO3);
+	glGenBuffers(1, &EBO3);
+
+	glBindVertexArray(VAO3);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO3);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesCrosshair), verticesCrosshair, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO3);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicesCrosshair), indicesCrosshair, GL_STATIC_DRAW);
+
+	// position attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	// color attribute
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	// texture coord attribute
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 	
 	glm::mat4 modelOrtho(1.0f);
 	glm::mat4 viewOrtho(1.0f);
@@ -180,7 +210,12 @@ int main()
 
 	//projectionOrtho = glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height), -1.0f, 10.0f);
 	//viewOrtho = glm::translate(viewOrtho, glm::vec3(0.0f, 0.0f, -1.0f));
-	viewOrtho = glm::scale(viewOrtho, glm::vec3(0.45f, 0.8f, 1.0f));
+	glm::mat4 viewOrthoCrosshair = glm::scale(viewOrtho, glm::vec3(0.45f, 0.8f, 1.0f));
+
+	glm::mat4 viewOrthoHeart = glm::translate(viewOrtho, glm::vec3(0.85f, 0.9f, 0.0f));
+	viewOrthoHeart = glm::scale(viewOrthoHeart, glm::vec3(1.35f, 0.8f, 1.0f));
+
+	int playerHealth = 3;
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -254,10 +289,12 @@ int main()
 			{
 				//CONVERT THIS TO PLAYER TAKING DAMAGE
 				zombies.erase(zombies.begin() + i);
-				//zombiesShaders[i].Delete();
+				zombiesShaders[i].Delete();
 				zombiesShaders.erase(zombiesShaders.begin() + i);
 				zombie_positions.erase(zombie_positions.begin() + i);
 				zombie_speeds.erase(zombie_speeds.begin() + i);
+				//player take damage
+				playerHealth -= 1;
 			}
 			else
 			{
@@ -274,14 +311,43 @@ int main()
 		//crosshair
 		textureCrosshair.Bind();
 
-		// render container
+		// render crosshair
 		CrosshairShader.Activate();
 		glBindVertexArray(VAO2);
 		glUniformMatrix4fv(glGetUniformLocation(CrosshairShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projectionOrtho));
 		glUniformMatrix4fv(glGetUniformLocation(CrosshairShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(modelOrtho));
-		glUniformMatrix4fv(glGetUniformLocation(CrosshairShader.ID, "view"), 1, GL_FALSE, glm::value_ptr(viewOrtho));
+		glUniformMatrix4fv(glGetUniformLocation(CrosshairShader.ID, "view"), 1, GL_FALSE, glm::value_ptr(viewOrthoCrosshair));
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+		//heart according to player health level
+		if (playerHealth == 3)
+		{
+			textureHeart3.Bind();
+		}
+		else if (playerHealth == 2)
+		{
+			textureHeart2.Bind();
+		}
+		else if (playerHealth == 1)
+		{
+			textureHeart1.Bind();
+		}
+		else
+		{
+			//DEAD
+		}
+		//dont render health when dead
+		if (playerHealth > 0)
+		{
+			// render heart
+			HeartShader.Activate();
+			glBindVertexArray(VAO3);
+			glUniformMatrix4fv(glGetUniformLocation(HeartShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projectionOrtho));
+			glUniformMatrix4fv(glGetUniformLocation(HeartShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(modelOrtho));
+			glUniformMatrix4fv(glGetUniformLocation(HeartShader.ID, "view"), 1, GL_FALSE, glm::value_ptr(viewOrthoHeart));
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		}
+		
 
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
