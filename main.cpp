@@ -110,6 +110,7 @@ int main()
 	//instancing
 	unsigned int number_of_zombies = 100;
 	std::vector <glm::vec3> zombie_positions;
+	std::vector <float> zombie_speeds;
 
 	std::vector <Model> zombies;
 	std::vector <Shader> zombiesShaders;
@@ -117,12 +118,16 @@ int main()
 	std::default_random_engine generator;
 	std::uniform_int_distribution<int> distribution(-30, 30);
 	
+	std::uniform_int_distribution<int> distribution2(10,20);
+
 	for (int i = 0; i < number_of_zombies; i++)
 	{
 		zombiesShaders.push_back(Shader("default.vert", "default.frag"));
 		zombies.push_back(Model("models/zombie/scene.gltf"));
 
 		glm::vec3 test = glm::vec3(distribution(generator) / 10.0f, 0.085f, distribution(generator) / 10.0f);
+
+		zombie_speeds.push_back(distribution2(generator) / 10.0f);
 
 		zombie_positions.push_back(test);
 
@@ -237,6 +242,13 @@ int main()
 			glm::quat zombie_quat2 = glm::quat(lookat2) * glm::quat(glm::vec3(glm::radians(-90.0f), 0, 0));
 			//std::cout << zombie_quat2.w << "/" << zombie_quat2.x << "/" << zombie_quat2.y << "/" << zombie_quat2.z << "/" << std::endl;
 			//std::cout << camera.Position.x << "   " << camera.Position.z << std::endl;
+
+
+			glm::vec3 directionToCamera = glm::normalize(camera.Position - zombie_positions[i]);
+
+			zombie_positions[i].x += directionToCamera.x * zombie_speeds[i] * 0.0005;
+			zombie_positions[i].z += directionToCamera.z * zombie_speeds[i] * 0.0005;
+
 
 			zombies[i].Draw(zombiesShaders[i], camera, zombie_positions[i], glm::quat(zombie_quat2), glm::vec3(0.007, 0.0070, 0.007));
 		}
