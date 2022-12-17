@@ -214,7 +214,7 @@ int main()
 
 	//projectionOrtho = glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height), -1.0f, 10.0f);
 	//viewOrtho = glm::translate(viewOrtho, glm::vec3(0.0f, 0.0f, -1.0f));
-	viewOrtho = glm::scale(viewOrtho, glm::vec3(0.6f, 0.8f, 1.0f));
+	viewOrtho = glm::scale(viewOrtho, glm::vec3(0.45f, 0.8f, 1.0f));
 
 	while (!glfwWindowShouldClose(window))
 	{
