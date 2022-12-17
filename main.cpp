@@ -108,7 +108,7 @@ int main()
 	//glfwSetCursor(window, crosshairCursor);
 
 	//instancing
-	unsigned int number_of_zombies = 100;
+	unsigned int number_of_zombies = 10;
 	std::vector <glm::vec3> zombie_positions;
 	std::vector <float> zombie_speeds;
 
@@ -231,7 +231,7 @@ int main()
 		//std::cout << zombie_quat.w << "/" << zombie_quat.x << "/" << zombie_quat.y << "/" << zombie_quat.z << "/" << std::endl;
 		zombieModel.Draw(zombieShader, camera, glm::vec3(0.2f, 0.085f, 0.0f), glm::quat(zombie_quat), glm::vec3(0.007, 0.0070, 0.007));
 
-		for (int i = 0; i < number_of_zombies; i++)
+		for (int i = 0; i < zombies.size(); i++)
 		{
 			glm::mat4 lookat2 = glm::lookAt(
 				glm::vec3(zombie_positions[i].x, zombie_positions[i].y, -zombie_positions[i].z),
@@ -245,12 +245,28 @@ int main()
 
 
 			glm::vec3 directionToCamera = glm::normalize(camera.Position - zombie_positions[i]);
-
+			//move zombies
 			zombie_positions[i].x += directionToCamera.x * zombie_speeds[i] * 0.0005;
 			zombie_positions[i].z += directionToCamera.z * zombie_speeds[i] * 0.0005;
 
-
-			zombies[i].Draw(zombiesShaders[i], camera, zombie_positions[i], glm::quat(zombie_quat2), glm::vec3(0.007, 0.0070, 0.007));
+			//delete zombie if too close
+			if (( std::abs(camera.Position.x - zombie_positions[i].x) + std::abs(camera.Position.y - zombie_positions[i].y)  + std::abs(camera.Position.z - zombie_positions[i].z)) <= 0.25)
+			{
+				//CONVERT THIS TO PLAYER TAKING DAMAGE
+				zombies.erase(zombies.begin() + i);
+				//zombiesShaders[i].Delete();
+				zombiesShaders.erase(zombiesShaders.begin() + i);
+				zombie_positions.erase(zombie_positions.begin() + i);
+				zombie_speeds.erase(zombie_speeds.begin() + i);
+			}
+			else
+			{
+				//update shading on zombies
+				zombiesShaders[i].Activate(); //zombie
+				glUniform4f(glGetUniformLocation(zombiesShaders[i].ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+				glUniform3f(glGetUniformLocation(zombiesShaders[i].ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
+				zombies[i].Draw(zombiesShaders[i], camera, zombie_positions[i], glm::quat(zombie_quat2), glm::vec3(0.007, 0.0070, 0.007));
+			}
 		}
 
 		//std::cout << zombies.meshes.size() << std::endl;
