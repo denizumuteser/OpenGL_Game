@@ -43,6 +43,7 @@ public:
 
 	void updateCollisionBox();
 	bool checkCollision(Model otherModel);
+	bool checkCollision(float BminX, float BmaxX, float BminY, float BmaxY, float BminZ, float BmaxZ);
 
 	float minX;
 	float maxX;

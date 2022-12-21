@@ -176,10 +176,10 @@ void Camera::Inputs(GLFWwindow* window)
 
 void Camera::updateCollisionBox()
 {
-	minX = Position.x - 0.25f;
-	maxX = Position.x + 0.25f;
-	minY = Position.y - 0.5f;
-	maxY = Position.y + 0.5f;
-	minZ = Position.z - 0.25f;
-	maxZ = Position.z + 0.25f;
+	minX = Position.x - 0.05f;
+	maxX = Position.x + 0.05f;
+	minY = Position.y - 0.1f;
+	maxY = Position.y + 0.1f;
+	minZ = Position.z - 0.05f;
+	maxZ = Position.z + 0.05f;
 }

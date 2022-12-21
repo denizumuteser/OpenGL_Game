@@ -108,7 +108,7 @@ int main()
 	//glfwSetCursor(window, crosshairCursor);
 
 	//instancing
-	unsigned int number_of_zombies = 10;
+	unsigned int number_of_zombies = 2;
 
 	std::vector <Model> zombies;
 
@@ -122,6 +122,7 @@ int main()
 		zombies.push_back(Model("models/zombie/scene.gltf"));
 		zombies[i].shader = Shader("default.vert", "default.frag");
 		zombies[i].position = glm::vec3(distribution(generator) / 10.0f, 0.085f, distribution(generator) / 10.0f);
+		zombies[i].updateCollisionBox();
 		zombies[i].speed = (distribution2(generator) / 10.0f);
 		zombies[i].shader.Activate();
 		glUniform4f(glGetUniformLocation(zombies[i].shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
@@ -293,10 +294,13 @@ int main()
 			//move zombies
 			zombies[i].position.x += directionToCamera.x * zombies[i].speed * 0.0005;
 			zombies[i].position.z += directionToCamera.z * zombies[i].speed * 0.0005;
-
+			zombies[i].updateCollisionBox();
 			//delete zombie if too close
-			if (( std::abs(camera.Position.x - zombies[i].position.x) + std::abs(camera.Position.y - zombies[i].position.y)  + std::abs(camera.Position.z - zombies[i].position.z)) <= 0.25)
-			{
+			
+			//check for collision
+			camera.updateCollisionBox();
+			if (zombies[i].checkCollision(camera.minX, camera.maxX, camera.minY, camera.maxY, camera.minZ, camera.maxZ))
+			{ 
 				//Zombie dies from collison
 				zombies[i].shader.Delete();
 				zombies.erase(zombies.begin() + i);

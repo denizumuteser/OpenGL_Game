@@ -260,10 +260,22 @@ unsigned int TextureFromFile(const char* path, const std::string& directory, boo
 
 void Model::updateCollisionBox()
 {
-    minX = position.x - 0.25f;
-    maxX = position.x + 0.25f;
-    minY = position.y - 0.5f;
-    maxY = position.y + 0.5f;
-    minZ = position.z - 0.25f;
-    maxZ = position.z + 0.25f;
+    minX = position.x - 0.05f;
+    maxX = position.x + 0.05f;
+    minY = position.y - 0.1f;
+    maxY = position.y + 0.1f;
+    minZ = position.z - 0.05f;
+    maxZ = position.z + 0.05f;
+}
+
+bool Model::checkCollision(float BminX, float BmaxX, float BminY, float BmaxY, float BminZ, float BmaxZ)
+{
+    return (
+        minX <= BmaxX &&
+        maxX >= BminX &&
+        minY <= BmaxY &&
+        maxY >= BminY &&
+        minZ <= BmaxZ &&
+        maxZ >= BminZ
+        );
 }
