@@ -18,6 +18,8 @@ public:
 
 	Texture(const char* image, const char* texType, GLuint slot, GLenum format, GLenum pixelType);
 
+	Texture(const char* image, GLuint slot, GLenum format, GLenum pixelType);
+
 	unsigned int TextureFromFile(const char* path, const std::string& directory, bool gamma = false);
 
 	// Assigns a texture unit to a texture

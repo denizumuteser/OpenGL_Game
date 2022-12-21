@@ -164,8 +164,11 @@
     <ClCompile Include="VBO.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ui.frag" />
+    <None Include="ui.vert" />
     <None Include="default.frag" />
     <None Include="default.vert" />
+    <None Include="instance.vert" />
     <None Include="light.frag" />
     <None Include="light.vert" />
   </ItemGroup>

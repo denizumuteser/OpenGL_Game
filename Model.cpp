@@ -5,22 +5,32 @@ unsigned int TextureFromFile(const char* path, const std::string& directory, boo
 std::vector<Texture> Model::textures_loaded;
 
 // constructor, expects a filepath to a 3D model.
-Model::Model(const std::string& path)
+Model::Model(
+    const std::string& path,
+    unsigned int instancing,
+    std::vector<glm::mat4> instanceMatrix)
 {
+    Model::instancing = instancing;
+    Model::instanceMatrix = instanceMatrix;
     //gammaCorrection = gamma;
     loadModel(path);
     //std::cout << "number of meshes from model : " << meshes.size() << std::endl;
 }
 
 // draws the model, and thus all its meshes
-void Model::Draw(Shader& shader, Camera& camera)
+void Model::Draw(
+    Shader& shader,
+    Camera& camera,
+    glm::vec3 translation,
+    glm::quat rotation,
+    glm::vec3 scale)
 {
+
+    // Go over all meshes and draw each one
     for (unsigned int i = 0; i < meshes.size(); i++)
     {
-        //std::cout << "drawing mesh number: " << i << std::endl;
-        meshes[i].Draw(shader, camera);
-    }
-        
+        meshes[i].Draw(shader, camera, glm::mat4(1.0f), translation, rotation, scale);
+    } 
 }
 
 // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
@@ -52,6 +62,7 @@ void Model::processNode(aiNode* node, const aiScene* scene)
         // the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         meshes.push_back(processMesh(mesh, scene));
+        //meshes.push_back(Mesh(vertices, indices, textures, instancing, instanceMatrix));
     }
     // after we've processed all of the meshes (if any) we then recursively process each of the children nodes
     for (unsigned int i = 0; i < node->mNumChildren; i++)
@@ -149,7 +160,8 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 
     // return a mesh object created from the extracted mesh data
     //std::cout << textures.size() << std::endl;
-    return Mesh(vertices, indices, textures);
+    //return Mesh(vertices, indices, textures);
+    return Mesh(vertices, indices, textures, instancing, instanceMatrix);
 }
 
 // checks all material textures of a given type and loads the textures if they're not loaded yet.
@@ -191,6 +203,18 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
     return textures;
 }
 
+bool Model::checkCollision(Model otherModel)
+{
+    return (
+        minX <= otherModel.maxX &&
+        maxX >= otherModel.minX &&
+        minY <= otherModel.maxY &&
+        maxY >= otherModel.minY &&
+        minZ <= otherModel.maxZ &&
+        maxZ >= otherModel.minZ
+        );
+}
+
 unsigned int TextureFromFile(const char* path, const std::string& directory, bool gamma)
 {
     std::string filename = std::string(path);
@@ -217,8 +241,11 @@ unsigned int TextureFromFile(const char* path, const std::string& directory, boo
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         stbi_image_free(data);
     }
@@ -229,4 +256,33 @@ unsigned int TextureFromFile(const char* path, const std::string& directory, boo
     }
 
     return textureID;
+}
+
+void Model::updateCollisionBox()
+{
+    minX = position.x - 0.05f;
+    maxX = position.x + 0.05f;
+    minY = position.y - 0.1f;
+    maxY = position.y + 0.1f;
+    minZ = position.z - 0.05f;
+    maxZ = position.z + 0.05f;
+}
+
+void Model::move(glm::vec3 directionVec)
+{
+    position.x += directionVec.x * speed * 0.0005;
+    position.z += directionVec.z * speed * 0.0005;
+    updateCollisionBox();
+}
+
+bool Model::checkCollision(float BminX, float BmaxX, float BminY, float BmaxY, float BminZ, float BmaxZ)
+{
+    return (
+        minX <= BmaxX &&
+        maxX >= BminX &&
+        minY <= BmaxY &&
+        maxY >= BminY &&
+        minZ <= BmaxZ &&
+        maxZ >= BminZ
+        );
 }
