@@ -257,3 +257,13 @@ unsigned int TextureFromFile(const char* path, const std::string& directory, boo
 
     return textureID;
 }
+
+void Model::updateCollisionBox()
+{
+    minX = position.x - 0.25f;
+    maxX = position.x + 0.25f;
+    minY = position.y - 0.5f;
+    maxY = position.y + 0.5f;
+    minZ = position.z - 0.25f;
+    maxZ = position.z + 0.25f;
+}

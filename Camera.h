@@ -10,6 +10,7 @@
 #include<glm/gtx/vector_angle.hpp>
 //#include <irrklang/irrKlang.h>
 #include"shaderClass.h"
+#include <memory>
 
 class Camera
 {
@@ -40,5 +41,14 @@ public:
 	void Matrix(Shader& shader, const char* uniform);
 	// Handles camera inputs
 	void Inputs(GLFWwindow* window);
+
+	void updateCollisionBox();
+
+	float minX;
+	float maxX;
+	float minY;
+	float maxY;
+	float minZ;
+	float maxZ;
 };
 #endif
