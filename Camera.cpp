@@ -34,6 +34,8 @@ void Camera::Matrix(Shader& shader, const char* uniform)
 	glUniformMatrix4fv(glGetUniformLocation(shader.ID, uniform), 1, GL_FALSE, glm::value_ptr(cameraMatrix));
 }
 
+
+
 void Camera::Inputs(GLFWwindow* window)
 {
 
@@ -51,43 +53,38 @@ void Camera::Inputs(GLFWwindow* window)
 	{
 		Position.x += speed * Orientation.x;
 		Position.z += speed * Orientation.z;
-		updateCollisionBox();
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
 		Position.x += speed * -glm::normalize(glm::cross(Orientation, Up)).x;
 		Position.z += speed * -glm::normalize(glm::cross(Orientation, Up)).z;
-		updateCollisionBox();
+		
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
 		Position.x += speed * -Orientation.x;
 		Position.z += speed * -Orientation.z;
-		updateCollisionBox();
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
 		Position.x += speed * glm::normalize(glm::cross(Orientation, Up)).x;
 		Position.z += speed * glm::normalize(glm::cross(Orientation, Up)).z;
-		updateCollisionBox();
 	}
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && cheat_mode)
 	{
 		Position += speed * Up;
-		updateCollisionBox();
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS && cheat_mode)
 	{
 		Position += speed * -Up;
-		updateCollisionBox();
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 	{
-		speed = 0.03f;
+		speed = 0.005f;
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
 	{
-		speed = 0.02f;
+		speed = 0.0025f;
 	}
 	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
 	{
@@ -102,7 +99,6 @@ void Camera::Inputs(GLFWwindow* window)
 			Orientation.y = 0.0f;
 			Position.x = 0.0f;
 			Position.y = 0.15f;
-			updateCollisionBox();
 
 		}
 		else
@@ -172,26 +168,4 @@ void Camera::Inputs(GLFWwindow* window)
 		// Makes sure the next time the camera looks around it doesn't jump
 		firstClick = true;
 	}
-}
-
-void Camera::updateCollisionBox()
-{
-	minX = Position.x - 0.05f;
-	maxX = Position.x + 0.05f;
-	minY = Position.y - 0.1f;
-	maxY = Position.y + 0.1f;
-	minZ = Position.z - 0.05f;
-	maxZ = Position.z + 0.05f;
-}
-
-bool Camera::checkCollision(float BminX, float BmaxX, float BminY, float BmaxY, float BminZ, float BmaxZ)
-{
-	return (
-		minX <= BmaxX &&
-		maxX >= BminX &&
-		minY <= BmaxY &&
-		maxY >= BminY &&
-		minZ <= BmaxZ &&
-		maxZ >= BminZ
-		);
 }
