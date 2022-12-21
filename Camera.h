@@ -42,6 +42,7 @@ public:
 	// Handles camera inputs
 	void Inputs(GLFWwindow* window);
 
+	bool checkCollision(float BminX, float BmaxX, float BminY, float BmaxY, float BminZ, float BmaxZ);
 	void updateCollisionBox();
 
 	float minX;

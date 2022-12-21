@@ -57,7 +57,6 @@ int main()
 	//models
 
 	Model mapModel("models/map2/scene.gltf");
-	Model zombieModel("models/zombie/scene.gltf");
 
 	//light transform
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -91,9 +90,6 @@ int main()
 	mapShader.Activate(); //map
 	glUniform4f(glGetUniformLocation(mapShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	glUniform3f(glGetUniformLocation(mapShader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
-	zombieShader.Activate(); //zombie
-	glUniform4f(glGetUniformLocation(zombieShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-	glUniform3f(glGetUniformLocation(zombieShader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
 
 	// Enables the Depth Buffer
 	glEnable(GL_DEPTH_TEST);
@@ -108,7 +104,7 @@ int main()
 	//glfwSetCursor(window, crosshairCursor);
 
 	//instancing
-	unsigned int number_of_zombies = 2;
+	unsigned int number_of_zombies = 10;
 
 	std::vector <Model> zombies;
 
@@ -270,17 +266,6 @@ int main()
 		//draw models
 		mapModel.Draw(mapShader, camera, glm::vec3(0.0f, -0.0f, 0.0f), glm::quat(0, 0, 0, 0), glm::vec3(0.1, 0.1, 0.1));
 
-		//rotate zombie
-		glm::mat4 lookat = glm::lookAt(
-			glm::vec3(0.2f, 0.085f, 0.0f),
-			glm::vec3(camera.Position.x, 0.085f, -camera.Position.z),
-			glm::vec3(0.0f, 1.0f, 0.0f)
-		);
-		
-		glm::quat zombie_quat = glm::quat(lookat) * glm::quat(glm::vec3(glm::radians(-90.0f), 0, 0));
-		zombieModel.Draw(zombieShader, camera, glm::vec3(0.2f, 0.085f, 0.0f), glm::quat(zombie_quat), glm::vec3(0.007, 0.0070, 0.007));
-
-
 		bool zombieCanMove = true;
 		for (int i = 0; i < zombies.size(); i++)
 		{
@@ -304,12 +289,12 @@ int main()
 			{ //collision check for camera vs zombie
 
 				//Zombie dies from collison
-				//zombies[i].shader.Delete();
-				//zombies.erase(zombies.begin() + i);
+				zombies[i].shader.Delete();
+				zombies.erase(zombies.begin() + i);
 				//player take damage
-				//playerHealth -= 1;
-				//continue;
-				zombieCanMove = false;
+				playerHealth -= 1;
+				continue;
+				//zombieCanMove = false;
 			}
 			
 			for (int j = 0; j < zombies.size(); j++)
@@ -403,7 +388,6 @@ int main()
 	shaderProgramWalls.Delete();
 	lightShader.Delete();
 	mapShader.Delete();
-	zombieShader.Delete();
 	for (int i = 0; i < zombies.size(); i++)
 	{
 		zombies[i].shader.Delete();

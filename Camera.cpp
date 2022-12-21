@@ -183,3 +183,15 @@ void Camera::updateCollisionBox()
 	minZ = Position.z - 0.05f;
 	maxZ = Position.z + 0.05f;
 }
+
+bool Camera::checkCollision(float BminX, float BmaxX, float BminY, float BmaxY, float BminZ, float BmaxZ)
+{
+	return (
+		minX <= BmaxX &&
+		maxX >= BminX &&
+		minY <= BmaxY &&
+		maxY >= BminY &&
+		minZ <= BmaxZ &&
+		maxZ >= BminZ
+		);
+}
