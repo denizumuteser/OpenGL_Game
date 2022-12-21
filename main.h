@@ -42,7 +42,23 @@ Vertex verticesFloor[] = //floor
 GLuint indicesFloor[] =
 {
 	0, 1, 2,
-	0, 2, 3
+	0, 2, 3,
+};
+
+GLuint indices2[] =
+{
+	0, 1, 2,
+	1, 2, 3,
+
+	5,4,7,
+	4,7,6,
+
+	8, 9, 11,
+	8,10, 11,
+
+	12,13,15,
+	12,14,15
+
 };
 
 Vertex lightVertices[] =

@@ -31,7 +31,7 @@ int main()
 	std::vector <GLuint> ind(indicesFloor, indicesFloor + sizeof(indicesFloor) / sizeof(GLuint));
 	std::vector <Texture> tex(texturesFloor, texturesFloor + sizeof(texturesFloor) / sizeof(Texture));
 	// Create floor mesh
-	Mesh floor(verts, ind, tex);
+	Mesh floor(verts, ind, texFloor);
 
 	//walls
 	Shader shaderProgramWalls("default.vert", "default.frag");
@@ -48,7 +48,7 @@ int main()
 	std::vector <Vertex> lightVerts(lightVertices, lightVertices + sizeof(lightVertices) / sizeof(Vertex));
 	std::vector <GLuint> lightInd(lightIndices, lightIndices + sizeof(lightIndices) / sizeof(GLuint));
 	// Crate light mesh
-	Mesh light(lightVerts, lightInd, tex);
+	Mesh light(lightVerts, lightInd, texFloor);
 
 	//shaders
 	Shader mapShader("default.vert", "default.frag");
@@ -65,7 +65,7 @@ int main()
 	lightModel = glm::translate(lightModel, lightPos);
 
 	//floor transform
-	glm::vec3 objectPos = glm::vec3(0.0f, -0.11f, 0.0f);
+	glm::vec3 objectPos = glm::vec3(0.0f, -0.0f, 0.0f);
 	glm::mat4 objectModel = glm::mat4(1.0f);
 	objectModel = glm::translate(objectModel, objectPos);
 	objectModel = glm::scale(objectModel, glm::vec3(5, 5, 5));
