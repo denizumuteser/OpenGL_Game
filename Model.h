@@ -52,6 +52,8 @@ public:
 	float minZ;
 	float maxZ;
 
+	void move(glm::vec3 directionVec);
+
 private:
 	// model data 
 	static std::vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.

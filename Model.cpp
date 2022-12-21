@@ -268,6 +268,13 @@ void Model::updateCollisionBox()
     maxZ = position.z + 0.05f;
 }
 
+void Model::move(glm::vec3 directionVec)
+{
+    position.x += directionVec.x * speed * 0.0005;
+    position.z += directionVec.z * speed * 0.0005;
+    updateCollisionBox();
+}
+
 bool Model::checkCollision(float BminX, float BmaxX, float BminY, float BmaxY, float BminZ, float BmaxZ)
 {
     return (

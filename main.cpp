@@ -280,8 +280,11 @@ int main()
 		glm::quat zombie_quat = glm::quat(lookat) * glm::quat(glm::vec3(glm::radians(-90.0f), 0, 0));
 		zombieModel.Draw(zombieShader, camera, glm::vec3(0.2f, 0.085f, 0.0f), glm::quat(zombie_quat), glm::vec3(0.007, 0.0070, 0.007));
 
+
+		bool zombieCanMove = true;
 		for (int i = 0; i < zombies.size(); i++)
 		{
+			zombieCanMove = true;
 			glm::mat4 lookat2 = glm::lookAt(
 				glm::vec3(zombies[i].position.x, zombies[i].position.y, -zombies[i].position.z),
 				glm::vec3(camera.Position.x, 0.085f, -camera.Position.z),
@@ -292,29 +295,46 @@ int main()
 
 			glm::vec3 directionToCamera = glm::normalize(camera.Position - zombies[i].position);
 			//move zombies
-			zombies[i].position.x += directionToCamera.x * zombies[i].speed * 0.0005;
-			zombies[i].position.z += directionToCamera.z * zombies[i].speed * 0.0005;
-			zombies[i].updateCollisionBox();
+			zombies[i].move(directionToCamera);
 			//delete zombie if too close
 			
 			//check for collision
 			camera.updateCollisionBox();
 			if (zombies[i].checkCollision(camera.minX, camera.maxX, camera.minY, camera.maxY, camera.minZ, camera.maxZ))
-			{ 
+			{ //collision check for camera vs zombie
+
 				//Zombie dies from collison
-				zombies[i].shader.Delete();
-				zombies.erase(zombies.begin() + i);
+				//zombies[i].shader.Delete();
+				//zombies.erase(zombies.begin() + i);
 				//player take damage
-				playerHealth -= 1;
+				//playerHealth -= 1;
+				//continue;
+				zombieCanMove = false;
 			}
-			else
+			
+			for (int j = 0; j < zombies.size(); j++)
 			{
-				//update shading on zombies
-				zombies[i].shader.Activate(); //zombie
-				glUniform4f(glGetUniformLocation(zombies[i].shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-				glUniform3f(glGetUniformLocation(zombies[i].shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
-				zombies[i].Draw(zombies[i].shader, camera, zombies[i].position, glm::quat(zombie_quat2), glm::vec3(0.007, 0.0070, 0.007));
+				if (i != j)//not check yourself
+				{
+					if (zombies[i].checkCollision(zombies[j]))
+					{//collided with other zombie
+						zombieCanMove = false;
+						break;
+					} 
+				}
 			}
+
+			if (!zombieCanMove)
+			{
+				zombies[i].move(-directionToCamera);
+			}
+
+			//update shading on zombies
+			zombies[i].shader.Activate(); //zombie
+			glUniform4f(glGetUniformLocation(zombies[i].shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+			glUniform3f(glGetUniformLocation(zombies[i].shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
+			zombies[i].Draw(zombies[i].shader, camera, zombies[i].position, glm::quat(zombie_quat2), glm::vec3(0.007, 0.0070, 0.007));
+			
 		}
 		//dont render health when dead
 		if (playerHealth > 0)
