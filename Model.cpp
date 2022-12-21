@@ -203,6 +203,18 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
     return textures;
 }
 
+bool Model::checkCollision(Model otherModel)
+{
+    return (
+        minX <= otherModel.maxX &&
+        maxX >= otherModel.minX &&
+        minY <= otherModel.maxY &&
+        maxY >= otherModel.minY &&
+        minZ <= otherModel.maxZ &&
+        maxZ >= otherModel.minZ
+        );
+}
+
 unsigned int TextureFromFile(const char* path, const std::string& directory, bool gamma)
 {
     std::string filename = std::string(path);

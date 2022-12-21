@@ -40,6 +40,15 @@ public:
 	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
 	Shader shader;
 
+	bool checkCollision(Model otherModel);
+
+	float minX;
+	float maxX;
+	float minY;
+	float maxY;
+	float minZ;
+	float maxZ;
+
 private:
 	// model data 
 	static std::vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
