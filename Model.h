@@ -35,6 +35,11 @@ public:
 	std::vector<glm::vec3> scalesMeshes;
 	std::vector<glm::mat4> matricesMeshes;
 	std::vector<glm::mat4> instanceMatrix;
+
+	float speed = 0;
+	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
+	Shader shader;
+
 private:
 	// model data 
 	static std::vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.

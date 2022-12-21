@@ -109,11 +109,8 @@ int main()
 
 	//instancing
 	unsigned int number_of_zombies = 10;
-	std::vector <glm::vec3> zombie_positions;
-	std::vector <float> zombie_speeds;
 
 	std::vector <Model> zombies;
-	std::vector <Shader> zombiesShaders;
 
 	std::default_random_engine generator;
 	std::uniform_int_distribution<int> distribution(-30, 30);
@@ -122,24 +119,14 @@ int main()
 
 	for (int i = 0; i < number_of_zombies; i++)
 	{
-		zombiesShaders.push_back(Shader("default.vert", "default.frag"));
 		zombies.push_back(Model("models/zombie/scene.gltf"));
-
-		glm::vec3 test = glm::vec3(distribution(generator) / 10.0f, 0.085f, distribution(generator) / 10.0f);
-
-		zombie_speeds.push_back(distribution2(generator) / 10.0f);
-
-		zombie_positions.push_back(test);
-
-		//std::cout << test.x << "/" << test.y << "/" << test.z << std::endl;
-
-		zombiesShaders[i].Activate(); //zombie
-		glUniform4f(glGetUniformLocation(zombiesShaders[i].ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-		glUniform3f(glGetUniformLocation(zombiesShaders[i].ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
-		
+		zombies[i].shader = Shader("default.vert", "default.frag");
+		zombies[i].position = glm::vec3(distribution(generator) / 10.0f, 0.085f, distribution(generator) / 10.0f);
+		zombies[i].speed = (distribution2(generator) / 10.0f);
+		zombies[i].shader.Activate();
+		glUniform4f(glGetUniformLocation(zombies[i].shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+		glUniform3f(glGetUniformLocation(zombies[i].shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
 	}
-
-
 
 	double prevTime = 0.0;
 	double crntTime = 0.0;
@@ -295,43 +282,36 @@ int main()
 		for (int i = 0; i < zombies.size(); i++)
 		{
 			glm::mat4 lookat2 = glm::lookAt(
-				glm::vec3(zombie_positions[i].x, zombie_positions[i].y, -zombie_positions[i].z),
+				glm::vec3(zombies[i].position.x, zombies[i].position.y, -zombies[i].position.z),
 				glm::vec3(camera.Position.x, 0.085f, -camera.Position.z),
 				glm::vec3(0.0f, 1.0f, 0.0f)
 			);
 
 			glm::quat zombie_quat2 = glm::quat(lookat2) * glm::quat(glm::vec3(glm::radians(-90.0f), 0, 0));
 
-			glm::vec3 directionToCamera = glm::normalize(camera.Position - zombie_positions[i]);
+			glm::vec3 directionToCamera = glm::normalize(camera.Position - zombies[i].position);
 			//move zombies
-			zombie_positions[i].x += directionToCamera.x * zombie_speeds[i] * 0.0005;
-			zombie_positions[i].z += directionToCamera.z * zombie_speeds[i] * 0.0005;
+			zombies[i].position.x += directionToCamera.x * zombies[i].speed * 0.0005;
+			zombies[i].position.z += directionToCamera.z * zombies[i].speed * 0.0005;
 
 			//delete zombie if too close
-			if (( std::abs(camera.Position.x - zombie_positions[i].x) + std::abs(camera.Position.y - zombie_positions[i].y)  + std::abs(camera.Position.z - zombie_positions[i].z)) <= 0.25)
+			if (( std::abs(camera.Position.x - zombies[i].position.x) + std::abs(camera.Position.y - zombies[i].position.y)  + std::abs(camera.Position.z - zombies[i].position.z)) <= 0.25)
 			{
-				//CONVERT THIS TO PLAYER TAKING DAMAGE
+				//Zombie dies from collison
+				zombies[i].shader.Delete();
 				zombies.erase(zombies.begin() + i);
-				zombiesShaders[i].Delete();
-				zombiesShaders.erase(zombiesShaders.begin() + i);
-				zombie_positions.erase(zombie_positions.begin() + i);
-				zombie_speeds.erase(zombie_speeds.begin() + i);
 				//player take damage
 				playerHealth -= 1;
 			}
 			else
 			{
 				//update shading on zombies
-				zombiesShaders[i].Activate(); //zombie
-				glUniform4f(glGetUniformLocation(zombiesShaders[i].ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-				glUniform3f(glGetUniformLocation(zombiesShaders[i].ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
-				zombies[i].Draw(zombiesShaders[i], camera, zombie_positions[i], glm::quat(zombie_quat2), glm::vec3(0.007, 0.0070, 0.007));
+				zombies[i].shader.Activate(); //zombie
+				glUniform4f(glGetUniformLocation(zombies[i].shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+				glUniform3f(glGetUniformLocation(zombies[i].shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
+				zombies[i].Draw(zombies[i].shader, camera, zombies[i].position, glm::quat(zombie_quat2), glm::vec3(0.007, 0.0070, 0.007));
 			}
 		}
-
-		//std::cout << zombies.meshes.size() << std::endl;
-
-
 		//dont render health when dead
 		if (playerHealth > 0)
 		{
@@ -400,9 +380,9 @@ int main()
 	lightShader.Delete();
 	mapShader.Delete();
 	zombieShader.Delete();
-	for (int i = 0; i < zombiesShaders.size(); i++)
+	for (int i = 0; i < zombies.size(); i++)
 	{
-		zombiesShaders[i].Delete();
+		zombies[i].shader.Delete();
 	}
 	// Delete window before ending the program
 	glfwDestroyWindow(window);
