@@ -42,6 +42,7 @@ public:
 
 
 	void updateCollisionBox();
+	void updateCollisionBox(float minx, float maxx, float miny, float maxy, float minz, float maxz);
 	bool checkCollision(Model otherModel);
 	bool checkCollision(float BminX, float BmaxX, float BminY, float BmaxY, float BminZ, float BmaxZ);
 
@@ -56,7 +57,7 @@ public:
 
 private:
 	// model data 
-	static std::vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
+	std::vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
 
 	unsigned int instancing;
 

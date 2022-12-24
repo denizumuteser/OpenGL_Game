@@ -2,7 +2,7 @@
 #include <string>
 unsigned int TextureFromFile(const char* path, const std::string& directory, bool gamma = false);
 //std::vector<Mesh> Model::meshes;
-std::vector<Texture> Model::textures_loaded;
+//std::vector<Texture> Model::textures_loaded;
 
 // constructor, expects a filepath to a 3D model.
 Model::Model(
@@ -213,6 +213,16 @@ bool Model::checkCollision(Model otherModel)
         minZ <= otherModel.maxZ &&
         maxZ >= otherModel.minZ
         );
+}
+
+void Model::updateCollisionBox(float minx, float maxx, float miny, float maxy, float minz, float maxz)
+{
+    minX = minx;
+    maxX = maxx;
+    minY = miny;
+    maxY = maxy;
+    minZ = minz;
+    maxZ = maxz;
 }
 
 unsigned int TextureFromFile(const char* path, const std::string& directory, bool gamma)

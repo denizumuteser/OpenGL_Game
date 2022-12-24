@@ -1,0 +1,11 @@
+Model Information:
+* title:	Minecraft Tree
+* source:	https://sketchfab.com/3d-models/minecraft-tree-19f631305c714abf9e5973a352f8a55d
+* author:	Coller (https://sketchfab.com/TheCollerroller)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Minecraft Tree" (https://sketchfab.com/3d-models/minecraft-tree-19f631305c714abf9e5973a352f8a55d) by Coller (https://sketchfab.com/TheCollerroller) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

@@ -51,12 +51,14 @@ int main()
 	Mesh light(lightVerts, lightInd, tex);
 
 	//shaders
-	Shader mapShader("default.vert", "default.frag");
-	Shader zombieShader("default.vert", "default.frag");
+	//Shader mapShader("default.vert", "default.frag");
+	//Shader crateShader("default.vert", "default.frag");
+	//Shader zombieShader("default.vert", "default.frag");
 
 	//models
 
 	//Model mapModel("models/map2/scene.gltf");
+	//Model crate("models/crate/scene.gltf");
 
 	//light transform
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -90,6 +92,10 @@ int main()
 	//mapShader.Activate(); //map
 	//glUniform4f(glGetUniformLocation(mapShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	//glUniform3f(glGetUniformLocation(mapShader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
+	
+	//crateShader.Activate(); //crate
+	//glUniform4f(glGetUniformLocation(crateShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	//glUniform3f(glGetUniformLocation(crateShader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
 
 	// Enables the Depth Buffer
 	glEnable(GL_DEPTH_TEST);
@@ -105,11 +111,13 @@ int main()
 
 	//instancing
 	unsigned int number_of_zombies = 10;
+	unsigned int number_of_crates = 10;
 
 	std::vector <Model> zombies;
+	std::vector <Model> crates;
 
 	std::default_random_engine generator;
-	std::uniform_int_distribution<int> distribution(-30, 30);
+	std::uniform_int_distribution<int> distribution(-25, 25);
 	
 	std::uniform_int_distribution<int> distribution2(10,20);
 
@@ -125,10 +133,33 @@ int main()
 		glUniform3f(glGetUniformLocation(zombies[i].shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
 	}
 
+	for (int ii = 0; ii < number_of_crates; ii++)
+	{
+		crates.push_back(Model("models/crate/scene.gltf"));
+		crates[ii].shader = Shader("default.vert", "default.frag");
+		crates[ii].position = glm::vec3(distribution(generator) / 10.0f, 0.085f, distribution(generator) / 10.0f);
+		//crates[ii].updateCollisionBox();
+		crates[ii].updateCollisionBox(
+			crates[ii].position.x - 0.1f,
+			crates[ii].position.x + 0.1f,
+			crates[ii].position.y - 0.1f,
+			crates[ii].position.y + 0.1f,
+			crates[ii].position.z - 0.1f + 0.1f,
+			crates[ii].position.z + 0.1f + 0.1f
+		);
+		crates[ii].shader.Activate();
+		glUniform4f(glGetUniformLocation(crates[ii].shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+		glUniform3f(glGetUniformLocation(crates[ii].shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
+	}
+
 	double prevTime = 0.0;
 	double crntTime = 0.0;
 	double timeDiff;
 	unsigned int counter = 0;
+
+
+	
+	
 
 	//crosshair
 	Shader CrosshairShader("ui.vert", "ui.frag");
@@ -261,10 +292,22 @@ int main()
 		// Draws meshes
 		floor.Draw(shaderProgramFloor, camera, objectModel);
 		walls.Draw(shaderProgramWalls, camera, objectModel);
+
+		//crate.Draw(crateShader, camera, glm::vec3(0.0f, -0.0f, 0.0f), glm::quat(0, 0, 0, 0), glm::vec3(0.005, 0.005, 0.005));
+
 		light.Draw(lightShader, camera, lightModel);
 
 		//draw models
 		//mapModel.Draw(mapShader, camera, glm::vec3(0.0f, -0.0f, 0.0f), glm::quat(0, 0, 0, 0), glm::vec3(0.1, 0.1, 0.1));
+		
+		for (int k = 0; k < crates.size(); k++)
+		{
+			//update shading on crates
+			crates[k].shader.Activate(); //zombie
+			glUniform4f(glGetUniformLocation(crates[k].shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+			glUniform3f(glGetUniformLocation(crates[k].shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
+			crates[k].Draw(crates[k].shader, camera, crates[k].position, glm::quat(glm::vec3(0)), glm::vec3(0.003, 0.003, 0.003));
+		}
 
 		bool zombieCanMove = true;
 		for (int i = 0; i < zombies.size(); i++)
@@ -296,6 +339,8 @@ int main()
 				continue;
 				//zombieCanMove = false;
 			}
+
+			//collision check for zombie vs crate
 			
 			for (int j = 0; j < zombies.size(); j++)
 			{
@@ -307,11 +352,23 @@ int main()
 						break;
 					} 
 				}
+				
+			}
+			//collision check for zombie vs crate
+			for (int jj = 0; jj < crates.size(); jj++)
+			{
+				if (crates[jj].checkCollision(zombies[i]))
+				{//collided with other zombie
+					std::cout << "collision" << std::endl;
+					zombieCanMove = false;
+					break;
+				}
 			}
 
 			if (!zombieCanMove)
 			{
 				zombies[i].move(-directionToCamera);
+				//zombies[i].move(glm::vec3(directionToCamera.z, -directionToCamera.y, -directionToCamera.x));
 			}
 
 			//update shading on zombies
@@ -391,6 +448,10 @@ int main()
 	for (int i = 0; i < zombies.size(); i++)
 	{
 		zombies[i].shader.Delete();
+	}
+	for (int i = 0; i < crates.size(); i++)
+	{
+		crates[i].shader.Delete();
 	}
 	// Delete window before ending the program
 	glfwDestroyWindow(window);
