@@ -31,7 +31,7 @@ int main()
 	std::vector <GLuint> ind(indicesFloor, indicesFloor + sizeof(indicesFloor) / sizeof(GLuint));
 	std::vector <Texture> tex(texturesFloor, texturesFloor + sizeof(texturesFloor) / sizeof(Texture));
 	// Create floor mesh
-	Mesh floor(verts, ind, texFloor);
+	Mesh floor(verts, ind, tex);
 
 	//walls
 	Shader shaderProgramWalls("default.vert", "default.frag");
@@ -48,7 +48,7 @@ int main()
 	std::vector <Vertex> lightVerts(lightVertices, lightVertices + sizeof(lightVertices) / sizeof(Vertex));
 	std::vector <GLuint> lightInd(lightIndices, lightIndices + sizeof(lightIndices) / sizeof(GLuint));
 	// Crate light mesh
-	Mesh light(lightVerts, lightInd, texFloor);
+	Mesh light(lightVerts, lightInd, tex);
 
 	//shaders
 	Shader mapShader("default.vert", "default.frag");
@@ -56,7 +56,7 @@ int main()
 
 	//models
 
-	Model mapModel("models/map2/scene.gltf");
+	//Model mapModel("models/map2/scene.gltf");
 
 	//light transform
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -87,9 +87,9 @@ int main()
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgramWalls.ID, "model"), 1, GL_FALSE, glm::value_ptr(objectModel2));
 	glUniform4f(glGetUniformLocation(shaderProgramWalls.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	glUniform3f(glGetUniformLocation(shaderProgramWalls.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
-	mapShader.Activate(); //map
-	glUniform4f(glGetUniformLocation(mapShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-	glUniform3f(glGetUniformLocation(mapShader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
+	//mapShader.Activate(); //map
+	//glUniform4f(glGetUniformLocation(mapShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	//glUniform3f(glGetUniformLocation(mapShader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
 
 	// Enables the Depth Buffer
 	glEnable(GL_DEPTH_TEST);
@@ -264,7 +264,7 @@ int main()
 		light.Draw(lightShader, camera, lightModel);
 
 		//draw models
-		mapModel.Draw(mapShader, camera, glm::vec3(0.0f, -0.0f, 0.0f), glm::quat(0, 0, 0, 0), glm::vec3(0.1, 0.1, 0.1));
+		//mapModel.Draw(mapShader, camera, glm::vec3(0.0f, -0.0f, 0.0f), glm::quat(0, 0, 0, 0), glm::vec3(0.1, 0.1, 0.1));
 
 		bool zombieCanMove = true;
 		for (int i = 0; i < zombies.size(); i++)
@@ -387,7 +387,7 @@ int main()
 	shaderProgramFloor.Delete();
 	shaderProgramWalls.Delete();
 	lightShader.Delete();
-	mapShader.Delete();
+	//mapShader.Delete();
 	for (int i = 0; i < zombies.size(); i++)
 	{
 		zombies[i].shader.Delete();
