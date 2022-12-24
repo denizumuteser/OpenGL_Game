@@ -125,7 +125,7 @@ int main()
 	std::default_random_engine generator;
 	std::uniform_int_distribution<int> distribution(-25, 25);
 	
-	std::uniform_int_distribution<int> distribution2(10,20);
+	std::uniform_int_distribution<int> distribution2(30,40);
 
 	for (int i = 0; i < number_of_zombies; i++)
 	{
@@ -366,6 +366,13 @@ int main()
 				continue;
 				//zombieCanMove = false;
 			}
+
+			if (!zombies[i].checkCollision(wallsMinX, wallsMaxX, wallsMinY, wallsMaxY, wallsMinZ, wallsMaxZ))
+			{ //collision check for walls vs zombie
+
+				zombieCanMove = false;
+			}
+
 
 			//collision check for zombie vs crate
 			
