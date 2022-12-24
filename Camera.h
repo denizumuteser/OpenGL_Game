@@ -45,6 +45,8 @@ public:
 	bool checkCollision(float BminX, float BmaxX, float BminY, float BmaxY, float BminZ, float BmaxZ);
 	void updateCollisionBox();
 
+	bool canMove = true;
+
 	float minX;
 	float maxX;
 	float minY;

@@ -41,6 +41,12 @@ int main()
 	std::vector <Texture> tex2(texturesWalls, texturesWalls + sizeof(texturesWalls) / sizeof(Texture));
 	Mesh walls(verts2, ind2, tex2);
 
+	float wallsMinX = -4.9f;
+	float wallsMaxX = 4.9f;
+	float wallsMinY = -4.9f;
+	float wallsMaxY = 4.9f;
+	float wallsMinZ = -4.9f;
+	float wallsMaxZ = 4.9f;
 
 	// Shader for light cube
 	Shader lightShader("light.vert", "light.frag");
@@ -309,10 +315,31 @@ int main()
 			crates[k].Draw(crates[k].shader, camera, crates[k].position, glm::quat(glm::vec3(0)), glm::vec3(0.003, 0.003, 0.003));
 		}
 
-		bool zombieCanMove = true;
+		/*
+		camera.canMove = true;
+		camera.updateCollisionBox();
+		//collision check for camera vs walls
+		if (!camera.checkCollision(wallsMinX, wallsMaxX, wallsMinY, wallsMaxY, wallsMinZ, wallsMaxZ))
+		{//collided with other zombie
+			std::cout << "collision" << std::endl;
+			camera.canMove = false;
+		}
+
+		//collision check for camera vs crate
+		for (int jjj = 0; jjj < crates.size(); jjj++)
+		{
+			if (crates[jjj].checkCollision(camera.minX, camera.maxX, camera.minY, camera.maxY, camera.minZ, camera.maxZ))
+			{//collided with other zombie
+				std::cout << "collision" << std::endl;
+				camera.canMove = false;
+				//camera.Position = prevPosCam;
+				break;
+			}
+		}
+		*/
 		for (int i = 0; i < zombies.size(); i++)
 		{
-			zombieCanMove = true;
+			bool zombieCanMove = true;
 			glm::mat4 lookat2 = glm::lookAt(
 				glm::vec3(zombies[i].position.x, zombies[i].position.y, -zombies[i].position.z),
 				glm::vec3(camera.Position.x, 0.085f, -camera.Position.z),
@@ -359,11 +386,11 @@ int main()
 			{
 				if (crates[jj].checkCollision(zombies[i]))
 				{//collided with other zombie
-					std::cout << "collision" << std::endl;
 					zombieCanMove = false;
 					break;
 				}
 			}
+
 
 			if (!zombieCanMove)
 			{
