@@ -41,9 +41,9 @@ public:
 	Shader shader;
 	glm::vec3 moveDirection;
 	glm::quat rotation;
-
-	void updateCollisionBox();
-	void updateCollisionBox(float minx, float maxx, float miny, float maxy, float minz, float maxz);
+	void updateCollisionBox(float x, float y, float z);
+	void setCollisionBox();
+	void setCollisionBox(float minx, float maxx, float miny, float maxy, float minz, float maxz);
 	bool checkCollision(Model otherModel);
 	bool checkCollision(float BminX, float BmaxX, float BminY, float BmaxY, float BminZ, float BmaxZ);
 

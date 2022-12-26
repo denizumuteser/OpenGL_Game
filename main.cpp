@@ -134,7 +134,14 @@ int main()
 		zombies.push_back(Model("models/zombie/scene.gltf"));
 		zombies[i].shader = Shader("default.vert", "default.frag");
 		zombies[i].position = glm::vec3(distribution(generator) / 10.0f, 0.085f, distribution(generator) / 10.0f);
-		zombies[i].updateCollisionBox();
+		zombies[i].setCollisionBox(
+			zombies[i].position.x - 0.05f,
+			zombies[i].position.x + 0.05f,
+			zombies[i].position.y - 0.1f,
+			zombies[i].position.y + 0.1f,
+			zombies[i].position.z - 0.05f,
+			zombies[i].position.z + 0.05f
+		);
 		zombies[i].speed = (distribution2(generator) / 10.0f);
 		zombies[i].shader.Activate();
 		glUniform4f(glGetUniformLocation(zombies[i].shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
@@ -147,7 +154,7 @@ int main()
 		crates[ii].shader = Shader("default.vert", "default.frag");
 		crates[ii].position = glm::vec3(distribution(generator) / 10.0f, 0.085f, distribution(generator) / 10.0f);
 		//crates[ii].updateCollisionBox();
-		crates[ii].updateCollisionBox(
+		crates[ii].setCollisionBox(
 			crates[ii].position.x - 0.1f,
 			crates[ii].position.x + 0.1f,
 			crates[ii].position.y - 0.1f,
@@ -293,7 +300,7 @@ int main()
 				Model tempBullet = Model("models/bullet/scene.gltf");
 				tempBullet.shader = Shader("default.vert", "default.frag");
 				tempBullet.position = camera.Position;
-				tempBullet.updateCollisionBox(
+				tempBullet.setCollisionBox(
 					tempBullet.position.x - 0.01f,
 					tempBullet.position.x + 0.01f,
 					tempBullet.position.y - 0.01f,
@@ -414,7 +421,7 @@ int main()
 			camera.updateCollisionBox();
 			if (zombies[i].checkCollision(camera.minX, camera.maxX, camera.minY, camera.maxY, camera.minZ, camera.maxZ))
 			{ //collision check for camera vs zombie
-
+				std::cout << "colide with camera" << std::endl;
 				//Zombie dies from collison
 				zombies[i].shader.Delete();
 				zombies.erase(zombies.begin() + i);
