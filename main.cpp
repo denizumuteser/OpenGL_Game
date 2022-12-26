@@ -128,18 +128,20 @@ int main()
 	
 	std::uniform_int_distribution<int> distribution2(30,40);
 
+	Model zombie = Model("models/zombie/scene.gltf");
+	zombie.shader = Shader("default.vert", "default.frag");
+
 	for (int i = 0; i < number_of_zombies; i++)
 	{
-		zombies.push_back(Model("models/zombie/scene.gltf"));
-		zombies[i].shader = Shader("default.vert", "default.frag");
+		zombies.push_back(zombie);
 		zombies[i].position = glm::vec3(distribution(generator) / 10.0f, 0.085f, distribution(generator) / 10.0f);
 		zombies[i].setCollisionBox(
-			zombies[i].position.x - 0.045f,
-			zombies[i].position.x + 0.045f,
+			zombies[i].position.x - 0.042f,
+			zombies[i].position.x + 0.042f,
 			zombies[i].position.y - 0.11f,
 			zombies[i].position.y + 0.11f,
-			zombies[i].position.z - 0.045f,
-			zombies[i].position.z + 0.045f
+			zombies[i].position.z - 0.042f,
+			zombies[i].position.z + 0.042f
 		);
 		zombies[i].speed = (distribution2(generator) / 10.0f);
 		zombies[i].shader.Activate();
@@ -147,10 +149,12 @@ int main()
 		glUniform3f(glGetUniformLocation(zombies[i].shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
 	}
 
+	Model crate = Model("models/crate/scene.gltf");
+	crate.shader = Shader("default.vert", "default.frag");
+
 	for (int ii = 0; ii < number_of_crates; ii++)
 	{
-		crates.push_back(Model("models/crate/scene.gltf"));
-		crates[ii].shader = Shader("default.vert", "default.frag");
+		crates.push_back(crate);
 		crates[ii].position = glm::vec3(distribution(generator) / 10.0f, 0.085f, distribution(generator) / 10.0f);
 		//crates[ii].updateCollisionBox();
 		crates[ii].setCollisionBox(
@@ -171,9 +175,6 @@ int main()
 	double timeDiff;
 	unsigned int counter = 0;
 
-
-	
-	
 
 	//crosshair
 	Shader CrosshairShader("ui.vert", "ui.frag");
@@ -278,9 +279,10 @@ int main()
 	bool killedByBullet = false;
 	bool bulletDestroyed = false;
 
+	bool GameState = 0; // 0 running, 1 lose, 2 win
+
 	while (!glfwWindowShouldClose(window))
 	{
-
 		//fps
 		crntTime = glfwGetTime();
 		timeDiff = crntTime - prevTime;
@@ -399,7 +401,6 @@ int main()
 				if (crates[c].checkCollision(bullets[b].minX, bullets[b].maxX, bullets[b].minY, bullets[b].maxY, bullets[b].minZ, bullets[b].maxZ))
 				{
 					//bullet is destroyed
-					//bullets[b].shader.Delete();
 					bullets.erase(bullets.begin() + b);
 					bulletDestroyed = true;
 					break;
@@ -414,7 +415,6 @@ int main()
 			{ //collision check for walls vs zombie
 
 				//bullet is destroyed
-				//bullets[b].shader.Delete();
 				bullets.erase(bullets.begin() + b);
 				continue;
 			}
@@ -434,8 +434,6 @@ int main()
 			glm::vec3 directionToCamera = glm::normalize(camera.Position - zombies[i].position);
 			//move zombies
 			zombies[i].move(glm::vec3(directionToCamera.x, 0, directionToCamera.z));
-			
-			
 
 			//check for bullet collision
 			killedByBullet = false;
@@ -444,7 +442,6 @@ int main()
 				if (zombies[i].checkCollision(bullets[b].minX, bullets[b].maxX, bullets[b].minY, bullets[b].maxY, bullets[b].minZ, bullets[b].maxZ))
 				{
 					//Zombie dies from bullet
-					zombies[i].shader.Delete();
 					zombies.erase(zombies.begin() + i);
 					killedByBullet = true;
 					break;
@@ -460,14 +457,11 @@ int main()
 			camera.updateCollisionBox();
 			if (zombies[i].checkCollision(camera.minX, camera.maxX, camera.minY, camera.maxY, camera.minZ, camera.maxZ))
 			{ //collision check for camera vs zombie
-				//std::cout << "colide with camera" << std::endl;
 				//Zombie dies from collison
-				zombies[i].shader.Delete();
 				zombies.erase(zombies.begin() + i);
 				//player take damage
 				playerHealth -= 1;
 				continue;
-				//zombieCanMove = false;
 			}
 
 			if (!zombies[i].checkCollision(wallsMinX, wallsMaxX, wallsMinY, wallsMaxY, wallsMinZ, wallsMaxZ))
@@ -569,8 +563,6 @@ int main()
 			glUniformMatrix4fv(glGetUniformLocation(EndScreenShader.ID, "view"), 1, GL_FALSE, glm::value_ptr(viewOrthoEndScreen));
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}
-		
-
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
 		// Take care of all GLFW events
@@ -582,14 +574,8 @@ int main()
 	shaderProgramWalls.Delete();
 	lightShader.Delete();
 	//mapShader.Delete();
-	for (int i = 0; i < zombies.size(); i++)
-	{
-		zombies[i].shader.Delete();
-	}
-	for (int i = 0; i < crates.size(); i++)
-	{
-		crates[i].shader.Delete();
-	}
+	zombie.shader.Delete();
+	crate.shader.Delete();
 	Bullet.shader.Delete();
 	// Delete window before ending the program
 	glfwDestroyWindow(window);
