@@ -34,7 +34,7 @@ void Camera::Matrix(Shader& shader, const char* uniform)
 	glUniformMatrix4fv(glGetUniformLocation(shader.ID, uniform), 1, GL_FALSE, glm::value_ptr(cameraMatrix));
 }
 
-void Camera::Inputs(GLFWwindow* window)
+void Camera::Inputs(GLFWwindow* window, bool* doFire)
 {
 	if (!glfwGetWindowAttrib(window, GLFW_FOCUSED))
 	{
@@ -113,10 +113,12 @@ void Camera::Inputs(GLFWwindow* window)
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && KEY_LEFT_CLICK_LAST_STATE == GLFW_RELEASE)
 	{
 		//SoundEngine2->play2D("shot.mp3", false);
+		*doFire = true;
 		KEY_LEFT_CLICK_LAST_STATE = GLFW_PRESS;
 	}
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
 	{
+		//*doFire = false;
 		KEY_LEFT_CLICK_LAST_STATE = GLFW_RELEASE;
 	}
 

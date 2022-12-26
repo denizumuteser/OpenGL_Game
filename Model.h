@@ -39,7 +39,8 @@ public:
 	float speed = 0;
 	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
 	Shader shader;
-
+	glm::vec3 moveDirection;
+	glm::quat rotation;
 
 	void updateCollisionBox();
 	void updateCollisionBox(float minx, float maxx, float miny, float maxy, float minz, float maxz);

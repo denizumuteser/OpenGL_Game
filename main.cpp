@@ -58,13 +58,13 @@ int main()
 
 	//shaders
 	//Shader mapShader("default.vert", "default.frag");
-	//Shader crateShader("default.vert", "default.frag");
-	//Shader zombieShader("default.vert", "default.frag");
+	Shader bulletShader("default.vert", "default.frag");
 
 	//models
 
 	//Model mapModel("models/map2/scene.gltf");
-	//Model crate("models/crate/scene.gltf");
+	Model bullet("models/bullet/scene.gltf");
+
 
 	//light transform
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -99,9 +99,9 @@ int main()
 	//glUniform4f(glGetUniformLocation(mapShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	//glUniform3f(glGetUniformLocation(mapShader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
 	
-	//crateShader.Activate(); //crate
-	//glUniform4f(glGetUniformLocation(crateShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-	//glUniform3f(glGetUniformLocation(crateShader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
+	bulletShader.Activate(); //crate
+	glUniform4f(glGetUniformLocation(bulletShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	glUniform3f(glGetUniformLocation(bulletShader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
 
 	// Enables the Depth Buffer
 	glEnable(GL_DEPTH_TEST);
@@ -121,6 +121,8 @@ int main()
 
 	std::vector <Model> zombies;
 	std::vector <Model> crates;
+	std::vector <Model> bullets;
+
 
 	std::default_random_engine generator;
 	std::uniform_int_distribution<int> distribution(-25, 25);
@@ -266,6 +268,7 @@ int main()
 	glm::mat4 viewOrthoEndScreen = glm::scale(viewOrtho, glm::vec3(10.0f, 10.0f, 1.0f));
 
 	int playerHealth = 3;
+	bool doFire = false;
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -283,7 +286,49 @@ int main()
 			prevTime = crntTime;
 			counter = 0;
 			// Handles camera inputs
-			camera.Inputs(window);
+			camera.Inputs(window, &doFire);
+			if (doFire)
+			{
+				//fire a bullet
+				Model tempBullet = Model("models/bullet/scene.gltf");
+				tempBullet.shader = Shader("default.vert", "default.frag");
+				tempBullet.position = camera.Position;
+				tempBullet.updateCollisionBox(
+					tempBullet.position.x - 0.01f,
+					tempBullet.position.x + 0.01f,
+					tempBullet.position.y - 0.01f,
+					tempBullet.position.y + 0.01f,
+					tempBullet.position.z - 0.01f,
+					tempBullet.position.z + 0.01f
+				);
+				//give speed
+				tempBullet.speed = 2.0f;
+				//give direction
+				tempBullet.moveDirection = glm::normalize(camera.Orientation);
+				//give rotation
+				//tempBullet.rotation = glm::quat(glm::lookAt(
+				//	tempBullet.position,
+				//	(tempBullet.position + tempBullet.moveDirection),
+				//	glm::vec3(1.0f, 0.0f, 0.0f)
+				//)) * glm::quat(glm::vec3(glm::radians(-90.0f), 0, 0));
+				tempBullet.rotation = glm::quat(glm::vec3(0, glm::radians(90.0f), 0)); //fix initial direction
+				tempBullet.rotation *=  glm::quat(glm::inverse(glm::lookAt(
+					glm::vec3(tempBullet.position.x, tempBullet.position.y, tempBullet.position.z),
+					(glm::vec3(tempBullet.position.x, tempBullet.position.y, tempBullet.position.z) + glm::vec3(tempBullet.moveDirection.x, tempBullet.moveDirection.y, tempBullet.moveDirection.z)),
+					glm::vec3(0.0f, 1.0f, 0.0f)
+				)));
+				//glm::vec3(glm::radians(-90.0f), 0, 0));
+
+				//tempBullet.shader.Activate();
+				//glUniform4f(glGetUniformLocation(tempBullet.shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+				//glUniform3f(glGetUniformLocation(tempBullet.shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
+				//add model to vector
+				bullets.push_back(tempBullet);
+
+				std::cout << "Fired at direction " << tempBullet.moveDirection.x << "|" << tempBullet.moveDirection.y<< "|" << tempBullet.moveDirection.z << std::endl;
+				doFire = false;
+			}
+			
 		}
 
 		// Specify the color of the background
@@ -299,22 +344,34 @@ int main()
 		floor.Draw(shaderProgramFloor, camera, objectModel);
 		walls.Draw(shaderProgramWalls, camera, objectModel);
 
-		//crate.Draw(crateShader, camera, glm::vec3(0.0f, -0.0f, 0.0f), glm::quat(0, 0, 0, 0), glm::vec3(0.005, 0.005, 0.005));
+		bullet.Draw(bulletShader, camera, glm::vec3(0.0f, -0.0f, 0.0f), glm::quat(0, 0, 0, 0), glm::vec3(0.1f, 0.1f, 0.1f));
 
 		light.Draw(lightShader, camera, lightModel);
 
 		//draw models
 		//mapModel.Draw(mapShader, camera, glm::vec3(0.0f, -0.0f, 0.0f), glm::quat(0, 0, 0, 0), glm::vec3(0.1, 0.1, 0.1));
 		
+		//draw crates
 		for (int k = 0; k < crates.size(); k++)
 		{
 			//update shading on crates
-			crates[k].shader.Activate(); //zombie
-			glUniform4f(glGetUniformLocation(crates[k].shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-			glUniform3f(glGetUniformLocation(crates[k].shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
+			crates[k].shader.Activate(); //crates
+			//glUniform4f(glGetUniformLocation(crates[k].shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+			//glUniform3f(glGetUniformLocation(crates[k].shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
 			crates[k].Draw(crates[k].shader, camera, crates[k].position, glm::quat(glm::vec3(0)), glm::vec3(0.003, 0.003, 0.003));
 		}
 
+		//draw bullets
+		for (int kk = 0; kk < bullets.size(); kk++)
+		{
+			//update shading on crates
+			bullets[kk].shader.Activate(); //bullets
+			glUniform4f(glGetUniformLocation(bullets[kk].shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+			glUniform3f(glGetUniformLocation(bullets[kk].shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
+			bullets[kk].Draw(bullets[kk].shader, camera, bullets[kk].position, bullets[kk].rotation, glm::vec3(0.01f, 0.01f, 0.01f));
+			bullets[kk].move(bullets[kk].moveDirection);
+			//std::cout << bullets[kk].position.x << "|" << bullets[kk].position.z << std::endl;
+		}
 		/*
 		camera.canMove = true;
 		camera.updateCollisionBox();
