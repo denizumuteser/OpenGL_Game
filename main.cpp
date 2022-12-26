@@ -63,8 +63,8 @@ int main()
 	//models
 
 	//Model mapModel("models/map2/scene.gltf");
-	Model bullet("models/bullet/scene.gltf");
-
+	Model Bullet = Model("models/bullet/scene.gltf");
+	Bullet.shader = Shader("default.vert", "default.frag");
 
 	//light transform
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -98,7 +98,6 @@ int main()
 	//mapShader.Activate(); //map
 	//glUniform4f(glGetUniformLocation(mapShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	//glUniform3f(glGetUniformLocation(mapShader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
-	
 	bulletShader.Activate(); //crate
 	glUniform4f(glGetUniformLocation(bulletShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	glUniform3f(glGetUniformLocation(bulletShader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
@@ -135,12 +134,12 @@ int main()
 		zombies[i].shader = Shader("default.vert", "default.frag");
 		zombies[i].position = glm::vec3(distribution(generator) / 10.0f, 0.085f, distribution(generator) / 10.0f);
 		zombies[i].setCollisionBox(
-			zombies[i].position.x - 0.05f,
-			zombies[i].position.x + 0.05f,
-			zombies[i].position.y - 0.1f,
-			zombies[i].position.y + 0.1f,
-			zombies[i].position.z - 0.05f,
-			zombies[i].position.z + 0.05f
+			zombies[i].position.x - 0.045f,
+			zombies[i].position.x + 0.045f,
+			zombies[i].position.y - 0.11f,
+			zombies[i].position.y + 0.11f,
+			zombies[i].position.z - 0.045f,
+			zombies[i].position.z + 0.045f
 		);
 		zombies[i].speed = (distribution2(generator) / 10.0f);
 		zombies[i].shader.Activate();
@@ -155,12 +154,12 @@ int main()
 		crates[ii].position = glm::vec3(distribution(generator) / 10.0f, 0.085f, distribution(generator) / 10.0f);
 		//crates[ii].updateCollisionBox();
 		crates[ii].setCollisionBox(
-			crates[ii].position.x - 0.1f,
-			crates[ii].position.x + 0.1f,
-			crates[ii].position.y - 0.1f,
-			crates[ii].position.y + 0.1f,
-			crates[ii].position.z - 0.1f + 0.1f,
-			crates[ii].position.z + 0.1f + 0.1f
+			crates[ii].position.x - 0.09f,
+			crates[ii].position.x + 0.09f,
+			crates[ii].position.y - 0.09f,
+			crates[ii].position.y + 0.09f,
+			crates[ii].position.z - 0.09f + 0.1f,
+			crates[ii].position.z + 0.09f + 0.1f
 		);
 		crates[ii].shader.Activate();
 		glUniform4f(glGetUniformLocation(crates[ii].shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
@@ -276,6 +275,8 @@ int main()
 
 	int playerHealth = 3;
 	bool doFire = false;
+	bool killedByBullet = false;
+	bool bulletDestroyed = false;
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -297,42 +298,31 @@ int main()
 			if (doFire)
 			{
 				//fire a bullet
-				Model tempBullet = Model("models/bullet/scene.gltf");
-				tempBullet.shader = Shader("default.vert", "default.frag");
-				tempBullet.position = camera.Position;
-				tempBullet.setCollisionBox(
-					tempBullet.position.x - 0.01f,
-					tempBullet.position.x + 0.01f,
-					tempBullet.position.y - 0.01f,
-					tempBullet.position.y + 0.01f,
-					tempBullet.position.z - 0.01f,
-					tempBullet.position.z + 0.01f
+				Bullet.position = camera.Position;
+				Bullet.setCollisionBox(
+					Bullet.position.x - 0.01f,
+					Bullet.position.x + 0.01f,
+					Bullet.position.y - 0.01f,
+					Bullet.position.y + 0.01f,
+					Bullet.position.z - 0.01f,
+					Bullet.position.z + 0.01f
 				);
 				//give speed
-				tempBullet.speed = 2.0f;
+				Bullet.speed = 20.0f;
 				//give direction
-				tempBullet.moveDirection = glm::normalize(camera.Orientation);
+				Bullet.moveDirection = glm::normalize(camera.Orientation);
 				//give rotation
-				//tempBullet.rotation = glm::quat(glm::lookAt(
-				//	tempBullet.position,
-				//	(tempBullet.position + tempBullet.moveDirection),
-				//	glm::vec3(1.0f, 0.0f, 0.0f)
-				//)) * glm::quat(glm::vec3(glm::radians(-90.0f), 0, 0));
-				tempBullet.rotation = glm::quat(glm::vec3(0, glm::radians(90.0f), 0)); //fix initial direction
-				tempBullet.rotation *=  glm::quat(glm::inverse(glm::lookAt(
-					glm::vec3(tempBullet.position.x, tempBullet.position.y, tempBullet.position.z),
-					(glm::vec3(tempBullet.position.x, tempBullet.position.y, tempBullet.position.z) + glm::vec3(tempBullet.moveDirection.x, tempBullet.moveDirection.y, tempBullet.moveDirection.z)),
+				Bullet.rotation = glm::quat(glm::vec3(0, glm::radians(90.0f), 0)); //fix initial direction
+				Bullet.rotation *=  glm::quat(glm::inverse(glm::lookAt(
+					glm::vec3(Bullet.position.x, Bullet.position.y, Bullet.position.z),
+					(glm::vec3(Bullet.position.x, Bullet.position.y, Bullet.position.z) + glm::vec3(Bullet.moveDirection.x, Bullet.moveDirection.y, Bullet.moveDirection.z)),
 					glm::vec3(0.0f, 1.0f, 0.0f)
 				)));
-				//glm::vec3(glm::radians(-90.0f), 0, 0));
 
-				//tempBullet.shader.Activate();
-				//glUniform4f(glGetUniformLocation(tempBullet.shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-				//glUniform3f(glGetUniformLocation(tempBullet.shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
 				//add model to vector
-				bullets.push_back(tempBullet);
+				bullets.push_back(Bullet);
 
-				std::cout << "Fired at direction " << tempBullet.moveDirection.x << "|" << tempBullet.moveDirection.y<< "|" << tempBullet.moveDirection.z << std::endl;
+				std::cout << "Fired at direction " << Bullet.moveDirection.x << "|" << Bullet.moveDirection.y<< "|" << Bullet.moveDirection.z << std::endl;
 				doFire = false;
 			}
 			
@@ -350,8 +340,6 @@ int main()
 		// Draws meshes
 		floor.Draw(shaderProgramFloor, camera, objectModel);
 		walls.Draw(shaderProgramWalls, camera, objectModel);
-
-		bullet.Draw(bulletShader, camera, glm::vec3(0.0f, -0.0f, 0.0f), glm::quat(0, 0, 0, 0), glm::vec3(0.1f, 0.1f, 0.1f));
 
 		light.Draw(lightShader, camera, lightModel);
 
@@ -401,6 +389,37 @@ int main()
 			}
 		}
 		*/
+		//collision check for bullet vs box
+		
+		for (int b = 0; b < bullets.size(); b++)
+		{
+			bulletDestroyed = false;
+			for (int c = 0; c < crates.size(); c++)
+			{
+				if (crates[c].checkCollision(bullets[b].minX, bullets[b].maxX, bullets[b].minY, bullets[b].maxY, bullets[b].minZ, bullets[b].maxZ))
+				{
+					//bullet is destroyed
+					//bullets[b].shader.Delete();
+					bullets.erase(bullets.begin() + b);
+					bulletDestroyed = true;
+					break;
+				}
+				
+			}
+			if (bulletDestroyed)
+			{
+				continue;
+			}
+			if (!bullets[b].checkCollision(wallsMinX, wallsMaxX, wallsMinY, wallsMaxY, wallsMinZ, wallsMaxZ))
+			{ //collision check for walls vs zombie
+
+				//bullet is destroyed
+				//bullets[b].shader.Delete();
+				bullets.erase(bullets.begin() + b);
+				continue;
+			}
+		}
+
 		for (int i = 0; i < zombies.size(); i++)
 		{
 			bool zombieCanMove = true;
@@ -414,14 +433,34 @@ int main()
 
 			glm::vec3 directionToCamera = glm::normalize(camera.Position - zombies[i].position);
 			//move zombies
-			zombies[i].move(directionToCamera);
-			//delete zombie if too close
+			zombies[i].move(glm::vec3(directionToCamera.x, 0, directionToCamera.z));
 			
+			
+
+			//check for bullet collision
+			killedByBullet = false;
+			for (int b = 0; b < bullets.size(); b++)
+			{
+				if (zombies[i].checkCollision(bullets[b].minX, bullets[b].maxX, bullets[b].minY, bullets[b].maxY, bullets[b].minZ, bullets[b].maxZ))
+				{
+					//Zombie dies from bullet
+					zombies[i].shader.Delete();
+					zombies.erase(zombies.begin() + i);
+					killedByBullet = true;
+					break;
+				}
+				
+			}
+			if (killedByBullet)
+			{
+				continue; //skip rendering zombie
+			}
+
 			//check for collision
 			camera.updateCollisionBox();
 			if (zombies[i].checkCollision(camera.minX, camera.maxX, camera.minY, camera.maxY, camera.minZ, camera.maxZ))
 			{ //collision check for camera vs zombie
-				std::cout << "colide with camera" << std::endl;
+				//std::cout << "colide with camera" << std::endl;
 				//Zombie dies from collison
 				zombies[i].shader.Delete();
 				zombies.erase(zombies.begin() + i);
@@ -465,7 +504,7 @@ int main()
 
 			if (!zombieCanMove)
 			{
-				zombies[i].move(-directionToCamera);
+				zombies[i].move(glm::vec3(-directionToCamera.x, 0, -directionToCamera.z));
 				//zombies[i].move(glm::vec3(directionToCamera.z, -directionToCamera.y, -directionToCamera.x));
 			}
 
@@ -551,6 +590,7 @@ int main()
 	{
 		crates[i].shader.Delete();
 	}
+	Bullet.shader.Delete();
 	// Delete window before ending the program
 	glfwDestroyWindow(window);
 	// Terminate GLFW before ending the program

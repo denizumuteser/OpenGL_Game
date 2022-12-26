@@ -291,8 +291,10 @@ void Model::setCollisionBox()
 void Model::move(glm::vec3 directionVec)
 {
     position.x += directionVec.x * speed * 0.0005;
+    position.y += directionVec.y * speed * 0.0005;
     position.z += directionVec.z * speed * 0.0005;
-    updateCollisionBox((directionVec.x * speed * 0.0005), 0, (directionVec.z * speed * 0.0005));
+
+    updateCollisionBox((directionVec.x * speed * 0.0005), (directionVec.y * speed * 0.0005), (directionVec.z * speed * 0.0005));
 }
 
 bool Model::checkCollision(float BminX, float BmaxX, float BminY, float BmaxY, float BminZ, float BmaxZ)
