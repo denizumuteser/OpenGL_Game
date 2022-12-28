@@ -138,8 +138,8 @@ int main()
 		zombies[i].setCollisionBox(
 			zombies[i].position.x - 0.042f,
 			zombies[i].position.x + 0.042f,
-			zombies[i].position.y - 0.11f,
-			zombies[i].position.y + 0.11f,
+			zombies[i].position.y - 0.13f,
+			zombies[i].position.y + 0.13f,
 			zombies[i].position.z - 0.042f,
 			zombies[i].position.z + 0.042f
 		);
