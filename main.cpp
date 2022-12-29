@@ -107,7 +107,11 @@ int main()
 
 	// Creates camera object
 	Camera camera(width, height, glm::vec3(0.0f, 0.2f, 1.0f));
-
+	//camera for minimap
+	Camera camera2(100, 100, glm::vec3(0.0f, 2.0f, 0.0f));
+	camera2.Orientation = glm::rotate(camera2.Orientation, glm::radians(-90.0f), glm::normalize(glm::cross(camera2.Orientation, glm::vec3(0.0f,1.0f,0.0f))));
+	// Calculates upcoming vertical change in the Orientation
+	
 	//init music
 	//SoundEngine->play2D("theme.mp3", true);
 	//change cursor icon
@@ -297,6 +301,16 @@ int main()
 			counter = 0;
 			// Handles camera inputs
 			camera.Inputs(window, &doFire);
+		
+			//camera2.Position.x = camera.Position.x;
+			//camera2.Position.z = camera.Position.z;
+
+			//camera2.Position.x = glm::normalize(glm::cross(camera.Position, glm::vec3(0,1,0))).x;
+			//camera2.Position.z = glm::normalize(glm::cross(camera.Position, glm::vec3(0, 1, 0))).z;
+
+			std::cout << camera.Position.x << "	" << camera.Position.z << std::endl;
+			//camera2.InputsMinimap(window, camera);
+
 			if (doFire)
 			{
 				//fire a bullet
@@ -430,7 +444,7 @@ int main()
 			);
 
 			glm::quat zombie_quat2 = glm::quat(lookat2) * glm::quat(glm::vec3(glm::radians(-90.0f), 0, 0));
-
+			zombies[i].rotation = zombie_quat2;
 			glm::vec3 directionToCamera = glm::normalize(camera.Position - zombies[i].position);
 			//move zombies
 			zombies[i].move(glm::vec3(directionToCamera.x, 0, directionToCamera.z));
@@ -563,6 +577,59 @@ int main()
 			glUniformMatrix4fv(glGetUniformLocation(EndScreenShader.ID, "view"), 1, GL_FALSE, glm::value_ptr(viewOrthoEndScreen));
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}
+
+		
+		//draw everthing again for minimap top down camera
+		//change viewport
+		glViewport(0,height-200,200,200);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		// Specify the color of the background
+		glClearColor(0.53f, 0.80f, 0.92f, 1.0f);
+		// Clean the back buffer and depth buffer
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// Updates and exports the camera matrix to the Vertex Shader
+		camera2.updateMatrix(90.0f, 0.01f, 10.0f); //modify fov to zoom
+
+		// Draws meshes
+		floor.Draw(shaderProgramFloor, camera2, objectModel);
+		walls.Draw(shaderProgramWalls, camera2, objectModel);
+
+		light.Draw(lightShader, camera2, lightModel);
+
+		//draw crates
+		for (int k = 0; k < crates.size(); k++)
+		{
+			//update shading on crates
+			crates[k].shader.Activate(); //crates
+			//glUniform4f(glGetUniformLocation(crates[k].shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+			//glUniform3f(glGetUniformLocation(crates[k].shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
+			crates[k].Draw(crates[k].shader, camera2, crates[k].position, glm::quat(glm::vec3(0)), glm::vec3(0.003, 0.003, 0.003));
+		}
+
+		//draw bullets
+		for (int kk = 0; kk < bullets.size(); kk++)
+		{
+			//update shading on crates
+			bullets[kk].shader.Activate(); //bullets
+			glUniform4f(glGetUniformLocation(bullets[kk].shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+			glUniform3f(glGetUniformLocation(bullets[kk].shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
+			bullets[kk].Draw(bullets[kk].shader, camera2, bullets[kk].position, bullets[kk].rotation, glm::vec3(0.01f, 0.01f, 0.01f));
+			//std::cout << bullets[kk].position.x << "|" << bullets[kk].position.z << std::endl;
+		}
+
+		//draw bullets
+		for (int i = 0; i < zombies.size(); i++)
+		{
+			//update shading on zombies
+			zombies[i].shader.Activate(); //zombie
+			glUniform4f(glGetUniformLocation(zombies[i].shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+			glUniform3f(glGetUniformLocation(zombies[i].shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
+			zombies[i].Draw(zombies[i].shader, camera2, zombies[i].position, zombies[i].rotation, glm::vec3(0.007, 0.0070, 0.007));
+		}
+
+		//change viewport back for 3d drawing
+		glViewport(0, 0, width, height);
+		
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
 		// Take care of all GLFW events

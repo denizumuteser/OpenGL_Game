@@ -41,6 +41,7 @@ public:
 	void Matrix(Shader& shader, const char* uniform);
 	// Handles camera inputs
 	void Inputs(GLFWwindow* window, bool* doFire);
+	//void InputsMinimap(GLFWwindow* window, Camera camera);
 
 	bool checkCollision(float BminX, float BmaxX, float BminY, float BmaxY, float BminZ, float BmaxZ);
 	void updateCollisionBox();
