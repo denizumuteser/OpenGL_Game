@@ -19,8 +19,10 @@ int main()
 	};
 	Texture texturesFloor[]
 	{
-		Texture("textures/Floor/planks.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE),
-		Texture("textures/Floor/planksSpec.png", "specular", 1, GL_RED, GL_UNSIGNED_BYTE),
+		//Texture("textures/Floor/planks.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE),
+		//Texture("textures/Floor/planksSpec.png", "specular", 1, GL_RED, GL_UNSIGNED_BYTE),
+		Texture("textures/Floor/stone.jpg", "diffuse", 0, GL_RGB, GL_UNSIGNED_BYTE),
+		Texture("textures/Floor/stoneSpec.jpg", "specular", 1, GL_RED, GL_UNSIGNED_BYTE),
 	};
 
 	// Generates Shader object using shaders default.vert and default.frag
@@ -120,25 +122,45 @@ int main()
 
 	//instancing
 	unsigned int number_of_zombies = 10;
-	unsigned int number_of_crates = 10;
+	unsigned int number_of_crates = 25;
 
 	std::vector <Model> zombies;
 	std::vector <Model> crates;
 	std::vector <Model> bullets;
 
+	std::vector <glm::vec3> placed_positions;
 
 	std::default_random_engine generator;
-	std::uniform_int_distribution<int> distribution(-25, 25);
-	
-	std::uniform_int_distribution<int> distribution2(30,40);
+	std::uniform_int_distribution<int> distribution(-48, 48);
+	std::uniform_int_distribution<int> distribution2(20, 30);
 
 	Model zombie = Model("models/zombie/scene.gltf");
 	zombie.shader = Shader("default.vert", "default.frag");
-
+	placed_positions.push_back(glm::vec3(0, 0, 0));
 	for (int i = 0; i < number_of_zombies; i++)
 	{
+		std::cout << "placed";
 		zombies.push_back(zombie);
-		zombies[i].position = glm::vec3(distribution(generator) / 10.0f, 0.085f, distribution(generator) / 10.0f);
+		bool placedCorrectly = false;
+		glm::vec3 choosen_pos;
+		while (!placedCorrectly)
+		{
+			placedCorrectly = true;
+			choosen_pos = glm::vec3(distribution(generator) / 10.0f, 0.085f, distribution(generator) / 10.0f);
+			for (int p = 0; p < placed_positions.size(); p++)
+			{
+				//std::cout << abs(choosen_pos.x - placed_positions[p].x) + abs(choosen_pos.z - placed_positions[p].z);
+				if ( abs(choosen_pos.x - placed_positions[p].x) + abs(choosen_pos.z - placed_positions[p].z) < 0.5)
+				{
+					placedCorrectly = false;
+				}
+				
+			}
+		}
+		zombies[i].position = choosen_pos;
+		placed_positions.push_back(choosen_pos);
+		//zombies[i].position = glm::vec3(distribution(generator) / 10.0f, 0.085f, distribution(generator) / 10.0f);
+		
 		zombies[i].setCollisionBox(
 			zombies[i].position.x - 0.042f,
 			zombies[i].position.x + 0.042f,
@@ -159,7 +181,27 @@ int main()
 	for (int ii = 0; ii < number_of_crates; ii++)
 	{
 		crates.push_back(crate);
-		crates[ii].position = glm::vec3(distribution(generator) / 10.0f, 0.085f, distribution(generator) / 10.0f);
+		
+		bool placedCorrectly = false;
+		glm::vec3 choosen_pos;
+		while (!placedCorrectly)
+		{
+			placedCorrectly = true;
+			choosen_pos = glm::vec3(distribution(generator) / 10.0f, 0.085f, distribution(generator) / 10.0f);
+			for (int p = 0; p < placed_positions.size(); p++)
+			{
+				if (abs(choosen_pos.x - placed_positions[p].x) + abs(choosen_pos.z - placed_positions[p].z) < 0.5)
+				{
+					placedCorrectly = false;
+				}
+
+			}
+		}
+		crates[ii].position = choosen_pos;
+		placed_positions.push_back(choosen_pos);
+		
+		//crates[ii].position = glm::vec3(distribution(generator) / 10.0f, 0.085f, distribution(generator) / 10.0f);
+		std::cout << crates[ii].position.x << "-" << crates[ii].position.x << std::endl;
 		//crates[ii].updateCollisionBox();
 		crates[ii].setCollisionBox(
 			crates[ii].position.x - 0.09f,
@@ -293,6 +335,7 @@ int main()
 		counter++;
 		if (timeDiff >= 1.0 / 60.0)
 		{
+			//std::cout << "X:" <<  camera.Position.x << " Y:" << camera.Position.y << " Z:" << camera.Position.z << std::endl;
 			std::string FPS = std::to_string((1.0 / timeDiff) * counter);
 			std::string ms = std::to_string((timeDiff / counter) * 1000);
 			std::string newTitle = "FPS: " + FPS + " ms: " + ms;
@@ -308,7 +351,7 @@ int main()
 			//camera2.Position.x = glm::normalize(glm::cross(camera.Position, glm::vec3(0,1,0))).x;
 			//camera2.Position.z = glm::normalize(glm::cross(camera.Position, glm::vec3(0, 1, 0))).z;
 
-			std::cout << camera.Position.x << "	" << camera.Position.z << std::endl;
+			//std::cout << camera.Position.x << "	" << camera.Position.z << std::endl;
 			//camera2.InputsMinimap(window, camera);
 
 			if (doFire)
@@ -594,7 +637,7 @@ int main()
 		floor.Draw(shaderProgramFloor, camera2, objectModel);
 		walls.Draw(shaderProgramWalls, camera2, objectModel);
 
-		light.Draw(lightShader, camera2, lightModel);
+		//light.Draw(lightShader, camera2, lightModel);
 
 		//draw crates
 		for (int k = 0; k < crates.size(); k++)

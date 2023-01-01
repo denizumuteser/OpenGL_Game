@@ -32,12 +32,12 @@ vec4 pointLight()
 
 	// intensity of light with respect to distance
 	float dist = length(lightVec);
-	float a = 3.0;
+	float a = 1;
 	float b = 0.7;
-	float inten = 4.0f / (a * dist * dist + b * dist + 1.0f);
+	float inten = 3.0f / (a * dist * dist + b * dist + 1.0f);
 
 	// ambient lighting
-	float ambient = 0.80f;
+	float ambient = 0.75f;
 
 	// diffuse lighting
 	vec3 normal = normalize(Normal);
