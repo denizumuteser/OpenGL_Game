@@ -24,8 +24,22 @@ int main()
 		Texture("textures/Floor/stone.jpg", "diffuse", 0, GL_RGB, GL_UNSIGNED_BYTE),
 		Texture("textures/Floor/stoneSpec.jpg", "specular", 1, GL_RED, GL_UNSIGNED_BYTE),
 	};
+	Texture texturesPlayer[]
+	{
+		Texture("textures/ui/player.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE),
+		Texture("textures/ui/playerSpec.png", "specular", 1, GL_RED, GL_UNSIGNED_BYTE),
+	};
 
 	// Generates Shader object using shaders default.vert and default.frag
+	//player
+	Shader shaderProgramPlayer("default.vert", "default.frag");
+	// Store mesh data in vectors for the mesh
+	std::vector <Vertex> verts3(verticesPlayer, verticesPlayer + sizeof(verticesPlayer) / sizeof(Vertex));
+	std::vector <GLuint> ind3(indicesPlayer, indicesPlayer + sizeof(indicesPlayer) / sizeof(GLuint));
+	std::vector <Texture> tex3(texturesPlayer, texturesPlayer + sizeof(texturesPlayer) / sizeof(Texture));
+	// Create floor mesh
+	Mesh player(verts3, ind3, tex3);
+	
 	//floor
 	Shader shaderProgramFloor("default.vert", "default.frag");
 	// Store mesh data in vectors for the mesh
@@ -90,6 +104,9 @@ int main()
 
 	lightShader.Activate(); //light
 	glUniform4f(glGetUniformLocation(lightShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	shaderProgramPlayer.Activate(); //player
+	glUniform4f(glGetUniformLocation(shaderProgramPlayer.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	glUniform3f(glGetUniformLocation(shaderProgramPlayer.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
 	shaderProgramFloor.Activate(); //floor
 	glUniform4f(glGetUniformLocation(shaderProgramFloor.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 	glUniform3f(glGetUniformLocation(shaderProgramFloor.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
@@ -110,7 +127,7 @@ int main()
 	// Creates camera object
 	Camera camera(width, height, glm::vec3(0.0f, 0.2f, 1.0f));
 	//camera for minimap
-	Camera camera2(100, 100, glm::vec3(0.0f, 2.0f, 0.0f));
+	Camera camera2(200, 200, glm::vec3(0.0f, 2.0f, 0.0f));
 	camera2.Orientation = glm::rotate(camera2.Orientation, glm::radians(-90.0f), glm::normalize(glm::cross(camera2.Orientation, glm::vec3(0.0f,1.0f,0.0f))));
 	// Calculates upcoming vertical change in the Orientation
 	
@@ -121,7 +138,7 @@ int main()
 	//glfwSetCursor(window, crosshairCursor);
 
 	//instancing
-	unsigned int number_of_zombies = 10;
+	unsigned int number_of_zombies = 20;
 	unsigned int number_of_crates = 25;
 
 	std::vector <Model> zombies;
@@ -136,10 +153,9 @@ int main()
 
 	Model zombie = Model("models/zombie/scene.gltf");
 	zombie.shader = Shader("default.vert", "default.frag");
-	placed_positions.push_back(glm::vec3(0, 0, 0));
+	placed_positions.push_back(glm::vec3(0, 0, 1));
 	for (int i = 0; i < number_of_zombies; i++)
 	{
-		std::cout << "placed";
 		zombies.push_back(zombie);
 		bool placedCorrectly = false;
 		glm::vec3 choosen_pos;
@@ -149,7 +165,6 @@ int main()
 			choosen_pos = glm::vec3(distribution(generator) / 10.0f, 0.085f, distribution(generator) / 10.0f);
 			for (int p = 0; p < placed_positions.size(); p++)
 			{
-				//std::cout << abs(choosen_pos.x - placed_positions[p].x) + abs(choosen_pos.z - placed_positions[p].z);
 				if ( abs(choosen_pos.x - placed_positions[p].x) + abs(choosen_pos.z - placed_positions[p].z) < 0.5)
 				{
 					placedCorrectly = false;
@@ -200,9 +215,6 @@ int main()
 		crates[ii].position = choosen_pos;
 		placed_positions.push_back(choosen_pos);
 		
-		//crates[ii].position = glm::vec3(distribution(generator) / 10.0f, 0.085f, distribution(generator) / 10.0f);
-		std::cout << crates[ii].position.x << "-" << crates[ii].position.x << std::endl;
-		//crates[ii].updateCollisionBox();
 		crates[ii].setCollisionBox(
 			crates[ii].position.x - 0.09f,
 			crates[ii].position.x + 0.09f,
@@ -220,7 +232,6 @@ int main()
 	double crntTime = 0.0;
 	double timeDiff;
 	unsigned int counter = 0;
-
 
 	//crosshair
 	Shader CrosshairShader("ui.vert", "ui.frag");
@@ -326,7 +337,7 @@ int main()
 	bool bulletDestroyed = false;
 
 	bool GameState = 0; // 0 running, 1 lose, 2 win
-
+	bool cheatmode = false;
 	while (!glfwWindowShouldClose(window))
 	{
 		//fps
@@ -335,7 +346,6 @@ int main()
 		counter++;
 		if (timeDiff >= 1.0 / 60.0)
 		{
-			//std::cout << "X:" <<  camera.Position.x << " Y:" << camera.Position.y << " Z:" << camera.Position.z << std::endl;
 			std::string FPS = std::to_string((1.0 / timeDiff) * counter);
 			std::string ms = std::to_string((timeDiff / counter) * 1000);
 			std::string newTitle = "FPS: " + FPS + " ms: " + ms;
@@ -343,21 +353,12 @@ int main()
 			prevTime = crntTime;
 			counter = 0;
 			// Handles camera inputs
-			camera.Inputs(window, &doFire);
-		
-			//camera2.Position.x = camera.Position.x;
-			//camera2.Position.z = camera.Position.z;
-
-			//camera2.Position.x = glm::normalize(glm::cross(camera.Position, glm::vec3(0,1,0))).x;
-			//camera2.Position.z = glm::normalize(glm::cross(camera.Position, glm::vec3(0, 1, 0))).z;
-
-			//std::cout << camera.Position.x << "	" << camera.Position.z << std::endl;
-			//camera2.InputsMinimap(window, camera);
+			camera.Inputs(window, &doFire, &cheatmode);
 
 			if (doFire)
 			{
 				//fire a bullet
-				Bullet.position = camera.Position;
+				Bullet.position = camera.Position + (glm::normalize(camera.Orientation) * 0.1f) ;
 				Bullet.setCollisionBox(
 					Bullet.position.x - 0.01f,
 					Bullet.position.x + 0.01f,
@@ -367,7 +368,7 @@ int main()
 					Bullet.position.z + 0.01f
 				);
 				//give speed
-				Bullet.speed = 20.0f;
+				Bullet.speed = 50.0f;
 				//give direction
 				Bullet.moveDirection = glm::normalize(camera.Orientation);
 				//give rotation
@@ -380,9 +381,10 @@ int main()
 
 				//add model to vector
 				bullets.push_back(Bullet);
-
-				std::cout << "Fired at direction " << Bullet.moveDirection.x << "|" << Bullet.moveDirection.y<< "|" << Bullet.moveDirection.z << std::endl;
-				doFire = false;
+				if (!cheatmode)
+				{
+					doFire = false;
+				}
 			}
 			
 		}
@@ -399,7 +401,6 @@ int main()
 		// Draws meshes
 		floor.Draw(shaderProgramFloor, camera, objectModel);
 		walls.Draw(shaderProgramWalls, camera, objectModel);
-
 		light.Draw(lightShader, camera, lightModel);
 
 		//draw models
@@ -424,30 +425,8 @@ int main()
 			glUniform3f(glGetUniformLocation(bullets[kk].shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
 			bullets[kk].Draw(bullets[kk].shader, camera, bullets[kk].position, bullets[kk].rotation, glm::vec3(0.01f, 0.01f, 0.01f));
 			bullets[kk].move(bullets[kk].moveDirection);
-			//std::cout << bullets[kk].position.x << "|" << bullets[kk].position.z << std::endl;
 		}
-		/*
-		camera.canMove = true;
-		camera.updateCollisionBox();
-		//collision check for camera vs walls
-		if (!camera.checkCollision(wallsMinX, wallsMaxX, wallsMinY, wallsMaxY, wallsMinZ, wallsMaxZ))
-		{//collided with other zombie
-			std::cout << "collision" << std::endl;
-			camera.canMove = false;
-		}
-
-		//collision check for camera vs crate
-		for (int jjj = 0; jjj < crates.size(); jjj++)
-		{
-			if (crates[jjj].checkCollision(camera.minX, camera.maxX, camera.minY, camera.maxY, camera.minZ, camera.maxZ))
-			{//collided with other zombie
-				std::cout << "collision" << std::endl;
-				camera.canMove = false;
-				//camera.Position = prevPosCam;
-				break;
-			}
-		}
-		*/
+		
 		//collision check for bullet vs box
 		
 		for (int b = 0; b < bullets.size(); b++)
@@ -624,19 +603,25 @@ int main()
 		
 		//draw everthing again for minimap top down camera
 		//change viewport
-		glViewport(0,height-200,200,200);
+		glViewport(0,height-300,300,300);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		// Specify the color of the background
 		glClearColor(0.53f, 0.80f, 0.92f, 1.0f);
 		// Clean the back buffer and depth buffer
 		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Updates and exports the camera matrix to the Vertex Shader
-		camera2.updateMatrix(90.0f, 0.01f, 10.0f); //modify fov to zoom
+		camera2.updateMatrix(120.0f, 0.01f, 10.0f); //modify fov to zoom
 
 		// Draws meshes
 		floor.Draw(shaderProgramFloor, camera2, objectModel);
 		walls.Draw(shaderProgramWalls, camera2, objectModel);
 
+		//player transform
+		glm::mat4 objectModelP = glm::mat4(1.0f);
+		objectModelP = glm::translate(objectModelP, camera.Position);
+		objectModelP = glm::scale(objectModelP, glm::vec3(0.15, 0.15, 0.15));
+
+		player.Draw(shaderProgramPlayer, camera2, objectModelP);
 		//light.Draw(lightShader, camera2, lightModel);
 
 		//draw crates
@@ -656,23 +641,60 @@ int main()
 			bullets[kk].shader.Activate(); //bullets
 			glUniform4f(glGetUniformLocation(bullets[kk].shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 			glUniform3f(glGetUniformLocation(bullets[kk].shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
-			bullets[kk].Draw(bullets[kk].shader, camera2, bullets[kk].position, bullets[kk].rotation, glm::vec3(0.01f, 0.01f, 0.01f));
-			//std::cout << bullets[kk].position.x << "|" << bullets[kk].position.z << std::endl;
+			bullets[kk].Draw(bullets[kk].shader, camera2, bullets[kk].position, bullets[kk].rotation, glm::vec3(0.03f, 0.03f, 0.03f));
 		}
 
-		//draw bullets
+		//draw zombies
 		for (int i = 0; i < zombies.size(); i++)
 		{
 			//update shading on zombies
 			zombies[i].shader.Activate(); //zombie
 			glUniform4f(glGetUniformLocation(zombies[i].shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
 			glUniform3f(glGetUniformLocation(zombies[i].shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
-			zombies[i].Draw(zombies[i].shader, camera2, zombies[i].position, zombies[i].rotation, glm::vec3(0.007, 0.0070, 0.007));
+			zombies[i].Draw(zombies[i].shader, camera2, zombies[i].position, zombies[i].rotation, glm::vec3(0.007, 0.007, 0.007));
 		}
 
 		//change viewport back for 3d drawing
 		glViewport(0, 0, width, height);
 		
+
+
+		for (int i = 0; i < (number_of_zombies-zombies.size()); i++)
+		{
+			bool placedCorrectly = false;
+			glm::vec3 choosen_pos;
+			while (!placedCorrectly)
+			{
+				placedCorrectly = true;
+				choosen_pos = glm::vec3(distribution(generator) / 10.0f, 0.085f, distribution(generator) / 10.0f);
+				for (int p = 0; p < placed_positions.size(); p++)
+				{
+					if (abs(choosen_pos.x - camera.Position.x) + abs(choosen_pos.z - camera.Position.z) < 2)
+					{
+						placedCorrectly = false;
+					}
+
+				}
+			}
+
+			zombie.position = choosen_pos;
+			zombie.setCollisionBox(
+				zombie.position.x - 0.042f,
+				zombie.position.x + 0.042f,
+				zombie.position.y - 0.13f,
+				zombie.position.y + 0.13f,
+				zombie.position.z - 0.042f,
+				zombie.position.z + 0.042f
+			);
+			zombie.speed = (distribution2(generator) / 10.0f);
+			zombie.shader.Activate();
+			glUniform4f(glGetUniformLocation(zombie.shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+			glUniform3f(glGetUniformLocation(zombie.shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
+			zombies.push_back(zombie);
+		}
+
+
+
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
 		// Take care of all GLFW events

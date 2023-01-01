@@ -40,7 +40,7 @@ public:
 	// Exports the camera matrix to a shader
 	void Matrix(Shader& shader, const char* uniform);
 	// Handles camera inputs
-	void Inputs(GLFWwindow* window, bool* doFire);
+	void Inputs(GLFWwindow* window, bool* doFire, bool* cheatmode);
 	//void InputsMinimap(GLFWwindow* window, Camera camera);
 
 	bool checkCollision(float BminX, float BmaxX, float BminY, float BmaxY, float BminZ, float BmaxZ);

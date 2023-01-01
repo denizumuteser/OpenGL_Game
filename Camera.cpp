@@ -34,8 +34,9 @@ void Camera::Matrix(Shader& shader, const char* uniform)
 	glUniformMatrix4fv(glGetUniformLocation(shader.ID, uniform), 1, GL_FALSE, glm::value_ptr(cameraMatrix));
 }
 
-void Camera::Inputs(GLFWwindow* window, bool* doFire)
+void Camera::Inputs(GLFWwindow* window, bool* doFire, bool* cheatmode)
 {
+	*cheatmode = cheat_mode;
 	if (!glfwGetWindowAttrib(window, GLFW_FOCUSED))
 	{
 		return;
@@ -118,7 +119,7 @@ void Camera::Inputs(GLFWwindow* window, bool* doFire)
 	}
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
 	{
-		//*doFire = false;
+		*doFire = false;
 		KEY_LEFT_CLICK_LAST_STATE = GLFW_RELEASE;
 	}
 
