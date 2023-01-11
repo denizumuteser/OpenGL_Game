@@ -600,62 +600,64 @@ int main()
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}
 
-		
-		//draw everthing again for minimap top down camera
+		if (playerHealth > 0)
+		{
+			//draw everthing again for minimap top down camera
 		//change viewport
-		glViewport(0,height-300,300,300);
-		glClear(GL_DEPTH_BUFFER_BIT);
-		// Specify the color of the background
-		glClearColor(0.53f, 0.80f, 0.92f, 1.0f);
-		// Clean the back buffer and depth buffer
-		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		// Updates and exports the camera matrix to the Vertex Shader
-		camera2.updateMatrix(120.0f, 0.01f, 10.0f); //modify fov to zoom
+			glViewport(0, height - 300, 300, 300);
+			glClear(GL_DEPTH_BUFFER_BIT);
+			// Specify the color of the background
+			glClearColor(0.53f, 0.80f, 0.92f, 1.0f);
+			// Clean the back buffer and depth buffer
+			//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			// Updates and exports the camera matrix to the Vertex Shader
+			camera2.updateMatrix(120.0f, 0.01f, 10.0f); //modify fov to zoom
 
-		// Draws meshes
-		floor.Draw(shaderProgramFloor, camera2, objectModel);
-		walls.Draw(shaderProgramWalls, camera2, objectModel);
+			// Draws meshes
+			floor.Draw(shaderProgramFloor, camera2, objectModel);
+			walls.Draw(shaderProgramWalls, camera2, objectModel);
 
-		//player transform
-		glm::mat4 objectModelP = glm::mat4(1.0f);
-		objectModelP = glm::translate(objectModelP, camera.Position);
-		objectModelP = glm::scale(objectModelP, glm::vec3(0.15, 0.15, 0.15));
+			//player transform
+			glm::mat4 objectModelP = glm::mat4(1.0f);
+			objectModelP = glm::translate(objectModelP, camera.Position);
+			objectModelP = glm::scale(objectModelP, glm::vec3(0.15, 0.15, 0.15));
 
-		player.Draw(shaderProgramPlayer, camera2, objectModelP);
-		//light.Draw(lightShader, camera2, lightModel);
+			player.Draw(shaderProgramPlayer, camera2, objectModelP);
+			//light.Draw(lightShader, camera2, lightModel);
 
-		//draw crates
-		for (int k = 0; k < crates.size(); k++)
-		{
-			//update shading on crates
-			crates[k].shader.Activate(); //crates
-			//glUniform4f(glGetUniformLocation(crates[k].shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-			//glUniform3f(glGetUniformLocation(crates[k].shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
-			crates[k].Draw(crates[k].shader, camera2, crates[k].position, glm::quat(glm::vec3(0)), glm::vec3(0.003, 0.003, 0.003));
+			//draw crates
+			for (int k = 0; k < crates.size(); k++)
+			{
+				//update shading on crates
+				crates[k].shader.Activate(); //crates
+				//glUniform4f(glGetUniformLocation(crates[k].shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+				//glUniform3f(glGetUniformLocation(crates[k].shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
+				crates[k].Draw(crates[k].shader, camera2, crates[k].position, glm::quat(glm::vec3(0)), glm::vec3(0.003, 0.003, 0.003));
+			}
+
+			//draw bullets
+			for (int kk = 0; kk < bullets.size(); kk++)
+			{
+				//update shading on crates
+				bullets[kk].shader.Activate(); //bullets
+				glUniform4f(glGetUniformLocation(bullets[kk].shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+				glUniform3f(glGetUniformLocation(bullets[kk].shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
+				bullets[kk].Draw(bullets[kk].shader, camera2, bullets[kk].position, bullets[kk].rotation, glm::vec3(0.03f, 0.03f, 0.03f));
+			}
+
+			//draw zombies
+			for (int i = 0; i < zombies.size(); i++)
+			{
+				//update shading on zombies
+				zombies[i].shader.Activate(); //zombie
+				glUniform4f(glGetUniformLocation(zombies[i].shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+				glUniform3f(glGetUniformLocation(zombies[i].shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
+				zombies[i].Draw(zombies[i].shader, camera2, zombies[i].position, zombies[i].rotation, glm::vec3(0.007, 0.007, 0.007));
+			}
+
+			//change viewport back for 3d drawing
+			glViewport(0, 0, width, height);
 		}
-
-		//draw bullets
-		for (int kk = 0; kk < bullets.size(); kk++)
-		{
-			//update shading on crates
-			bullets[kk].shader.Activate(); //bullets
-			glUniform4f(glGetUniformLocation(bullets[kk].shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-			glUniform3f(glGetUniformLocation(bullets[kk].shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
-			bullets[kk].Draw(bullets[kk].shader, camera2, bullets[kk].position, bullets[kk].rotation, glm::vec3(0.03f, 0.03f, 0.03f));
-		}
-
-		//draw zombies
-		for (int i = 0; i < zombies.size(); i++)
-		{
-			//update shading on zombies
-			zombies[i].shader.Activate(); //zombie
-			glUniform4f(glGetUniformLocation(zombies[i].shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-			glUniform3f(glGetUniformLocation(zombies[i].shader.ID, "lightPos"), lightPos2.x, lightPos2.y, lightPos2.z);
-			zombies[i].Draw(zombies[i].shader, camera2, zombies[i].position, zombies[i].rotation, glm::vec3(0.007, 0.007, 0.007));
-		}
-
-		//change viewport back for 3d drawing
-		glViewport(0, 0, width, height);
 		
 
 
