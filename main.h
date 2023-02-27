@@ -7,7 +7,7 @@
 //music
 //irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
 
-const unsigned int width = 1200;
+const unsigned int width = 1920;
 const unsigned int height = 9.0 / 16.0 * width;
 float lastX = width / 2.0f;
 float lastY = height / 2.0f;
@@ -40,6 +40,22 @@ Vertex verticesFloor[] = //floor
 
 // Indices for vertices order
 GLuint indicesFloor[] =
+{
+	0, 1, 2,
+	0, 2, 3,
+};
+
+// Vertices coordinates
+Vertex verticesPlayer[] = //floor
+{ //               COORDINATES           /            NORMALS          /       COLOR        //           TexCoord         /
+	Vertex{glm::vec3(-1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(0.0f, 0.0f)},
+	Vertex{glm::vec3(-1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(0.0f, 1.0f)},
+	Vertex{glm::vec3(1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(1.0f, 1.0f)},
+	Vertex{glm::vec3(1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1), glm::vec2(1.0f, 0.0f)}
+};
+
+// Indices for vertices order
+GLuint indicesPlayer[] =
 {
 	0, 1, 2,
 	0, 2, 3,

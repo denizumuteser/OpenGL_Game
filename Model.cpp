@@ -203,6 +203,16 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
     return textures;
 }
 
+void Model::updateCollisionBox(float addedx, float addedy, float addedz)
+{
+    minX += addedx;
+    maxX += addedx;
+    minY += addedy;
+    maxY += addedy;
+    minZ += addedz;
+    maxZ += addedz;
+}
+
 bool Model::checkCollision(Model otherModel)
 {
     return (
@@ -215,7 +225,7 @@ bool Model::checkCollision(Model otherModel)
         );
 }
 
-void Model::updateCollisionBox(float minx, float maxx, float miny, float maxy, float minz, float maxz)
+void Model::setCollisionBox(float minx, float maxx, float miny, float maxy, float minz, float maxz)
 {
     minX = minx;
     maxX = maxx;
@@ -268,7 +278,7 @@ unsigned int TextureFromFile(const char* path, const std::string& directory, boo
     return textureID;
 }
 
-void Model::updateCollisionBox()
+void Model::setCollisionBox()
 {
     minX = position.x - 0.05f;
     maxX = position.x + 0.05f;
@@ -280,9 +290,11 @@ void Model::updateCollisionBox()
 
 void Model::move(glm::vec3 directionVec)
 {
-    position.x += directionVec.x * speed * 0.0005;
-    position.z += directionVec.z * speed * 0.0005;
-    updateCollisionBox();
+    position.x += directionVec.x * speed * 0.001;
+    position.y += directionVec.y * speed * 0.001;
+    position.z += directionVec.z * speed * 0.001;
+
+    updateCollisionBox((directionVec.x * speed * 0.001), (directionVec.y * speed * 0.001), (directionVec.z * speed * 0.001));
 }
 
 bool Model::checkCollision(float BminX, float BmaxX, float BminY, float BmaxY, float BminZ, float BmaxZ)
